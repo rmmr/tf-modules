@@ -1,0 +1,5 @@
+*.env
+*.env.*
+.terraform
+.build
+.DS_Store
