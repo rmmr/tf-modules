@@ -13,7 +13,8 @@ data "null_data_source" "_" {
 
 resource "null_resource" "_" {
   triggers = {
-    setup_file_has_changed = filemd5("${local.abs_source_dir}/setup.py")
+    setup_file_has_changed        = fileexists("${local.abs_source_dir}/setup.py") ? filemd5("${local.abs_source_dir}/setup.py") : null
+    requirements_file_has_changed = fileexists("${local.abs_source_dir}/requirements.txt") ? filemd5("${local.abs_source_dir}/requirements.txt") : null
   }
 
   provisioner "local-exec" {
@@ -23,7 +24,8 @@ resource "null_resource" "_" {
         -v ${local.abs_source_dir}:/var/task \
         "lambci/lambda:build-python3.7" \
         /bin/sh -c "
-            pip install . -t /tmp/build > /dev/null 2>&1; \
+            ${fileexists("${local.abs_source_dir}/setup.py") ? "pip install . -t /tmp/build > /dev/null 2>&1;" : ""}\
+            ${fileexists("${local.abs_source_dir}/requirements.txt") ? "pip install -r requirements.txt -t /tmp/build > /dev/null 2>&1;" : ""}\
             cd /tmp/build && zip -r9  - .; \
             exit;" > ${local.abs_output_file}
     EOF
