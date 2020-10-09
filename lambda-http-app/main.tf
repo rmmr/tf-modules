@@ -1,11 +1,3 @@
-
-locals {
-  runtime = "python${var.python_version}"
-  env = merge({
-
-  }, var.env)
-}
-
 module "acm" {
   source  = "terraform-aws-modules/acm/aws"
   version = "~> v2.0"
@@ -39,7 +31,7 @@ module "api_gateway" {
 
   integrations = {
     "$default" = {
-      lambda_arn = module.asgi_lambda.this_lambda_function_arn
+      lambda_arn = module.app_lambda.this_lambda_function_arn
     }
   }
 
@@ -58,15 +50,15 @@ resource "aws_route53_record" "_" {
   }
 }
 
-module "asgi_lambda" {
+module "app_lambda" {
   source = "../lambda"
 
-  function_name = "${var.name}-asgi"
-  handler       = var.asgi_handler
-  runtime       = local.runtime
+  function_name = "${var.name}-app"
+  handler       = var.handler
+  runtime       = var.runtime
   memory_size   = var.memory_size
   timeout       = var.timeout
-  env           = local.env
+  env           = var.env
 
   subnet_ids            = var.subnet_ids
   security_group_ids    = var.security_group_ids
@@ -95,10 +87,10 @@ module "handlers" {
 
   function_name = "${var.name}-${each.key}"
   handler       = each.value.handler
-  runtime       = lookup(each.value, "runtime", local.runtime)
+  runtime       = lookup(each.value, "runtime", var.runtime)
   memory_size   = lookup(each.value, "memory_size", var.memory_size)
   timeout       = lookup(each.value, "timeout", var.timeout)
-  env           = merge(lookup(each.value, "env", {}), local.env)
+  env           = merge(lookup(each.value, "env", {}), var.env)
 
   subnet_ids            = lookup(each.value, "subnet_ids", var.subnet_ids)
   security_group_ids    = lookup(each.value, "security_group_ids", var.security_group_ids)
