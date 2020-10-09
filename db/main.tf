@@ -46,6 +46,12 @@ resource "aws_db_proxy_default_target_group" "_" {
   }
 }
 
+resource "aws_db_proxy_target" "_" {
+  db_cluster_identifier = aws_rds_cluster._.cluster_identifier
+  db_proxy_name         = aws_db_proxy._.db_proxy_name
+  target_group_name     = aws_db_proxy_default_target_group._.name
+}
+
 resource "aws_db_subnet_group" "_" {
   name       = "${var.name}-subnet-group"
   subnet_ids = var.subnet_ids
@@ -69,12 +75,12 @@ resource "aws_rds_cluster" "_" {
 }
 
 resource "aws_rds_cluster_instance" "_" {
-  count               = var.instance_count
-  identifier          = "${var.name}-instance-${count.index}"
-  cluster_identifier  = aws_rds_cluster._.id
-  instance_class      = var.instance_class
-  engine              = aws_rds_cluster._.engine
-  engine_version      = aws_rds_cluster._.engine_version
+  count              = var.instance_count
+  identifier         = "${var.name}-instance-${count.index}"
+  cluster_identifier = aws_rds_cluster._.id
+  instance_class     = var.instance_class
+  engine             = aws_rds_cluster._.engine
+  engine_version     = aws_rds_cluster._.engine_version
 }
 
 resource "aws_iam_policy" "db_proxy" {
