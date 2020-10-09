@@ -48,7 +48,7 @@ resource "aws_db_proxy_default_target_group" "_" {
 
 resource "aws_db_proxy_target" "_" {
   db_cluster_identifier = aws_rds_cluster._.cluster_identifier
-  db_proxy_name         = aws_db_proxy._.db_proxy_name
+  db_proxy_name         = aws_db_proxy._.name
   target_group_name     = aws_db_proxy_default_target_group._.name
 }
 
