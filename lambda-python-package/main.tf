@@ -21,6 +21,7 @@ resource "null_resource" "_" {
     command = <<EOF
     mkdir -p ${dirname(local.abs_output_file)}
     docker run \
+        ${join(" ", [for k, v in var.env : "-e ${k}=${v}"])}\
         -v ${local.abs_source_dir}:/var/task \
         "lambci/lambda:build-python3.7" \
         /bin/sh -c "
