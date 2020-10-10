@@ -91,6 +91,6 @@ variable "allowed_triggers" {
 }
 
 variable "iam_policy_arns" {
-  type    = set(string)
+  type    = list(string)
   default = []
 }

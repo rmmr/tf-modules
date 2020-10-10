@@ -69,11 +69,11 @@ resource "aws_iam_policy_attachment" "vpc" {
 }
 
 resource "aws_iam_policy_attachment" "custom" {
-  for_each = var.iam_policy_arns
+  count = length(var.iam_policy_arns)
 
-  name       = "${var.function_name}-custom-${each.value}"
+  name       = "${var.function_name}-custom-${count.index}"
   roles      = [aws_iam_role.lambda.name]
-  policy_arn = each.value
+  policy_arn = var.iam_policy_arns[count.index]
 }
 
 resource "aws_lambda_function" "this" {
