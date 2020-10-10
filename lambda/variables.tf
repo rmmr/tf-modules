@@ -89,3 +89,8 @@ variable "allowed_triggers" {
   type    = map(any)
   default = {}
 }
+
+variable "iam_policy_arns" {
+  type    = list(string)
+  default = []
+}

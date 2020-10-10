@@ -78,3 +78,8 @@ variable "handlers" {
   type        = map
   default     = {}
 }
+
+variable "iam_policy_arns" {
+  type    = list(string)
+  default = []
+}

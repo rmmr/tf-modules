@@ -68,6 +68,14 @@ resource "aws_iam_policy_attachment" "vpc" {
   policy_arn = aws_iam_policy.vpc[0].arn
 }
 
+resource "aws_iam_policy_attachment" "custom" {
+  for_each = var.iam_policy_arns
+
+  name       = "${var.function_name}-custom-${each.value}"
+  roles      = [aws_iam_role.lambda.name]
+  policy_arn = each.value
+}
+
 resource "aws_lambda_function" "this" {
   function_name                  = var.function_name
   description                    = var.description
