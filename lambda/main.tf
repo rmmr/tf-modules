@@ -4,7 +4,8 @@ resource "aws_cloudwatch_log_group" "lambda" {
 
 data "aws_iam_policy_document" "assume_role" {
   statement {
-    effect  = "Allow"
+    effect = "Allow"
+
     actions = ["sts:AssumeRole"]
 
     principals {
@@ -24,8 +25,8 @@ resource "aws_iam_role" "lambda" {
 
 data "aws_iam_policy_document" "logs" {
   statement {
-    effect = "Allow"
 
+    effect = "Allow"
     actions = [
       "logs:CreateLogStream",
       "logs:PutLogEvents",
