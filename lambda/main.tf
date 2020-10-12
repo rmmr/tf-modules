@@ -1,3 +1,8 @@
+provider "aws" {
+  alias  = "us_east_1"
+  region = "us-east-1"
+}
+
 resource "aws_cloudwatch_log_group" "lambda" {
   name = "/aws/lambda/${var.function_name}"
 }
@@ -10,7 +15,7 @@ data "aws_iam_policy_document" "assume_role" {
 
     principals {
       type        = "Service"
-      identifiers = ["lambda.amazonaws.com"]
+      identifiers = concat(["lambda.amazonaws.com"], var.edge ? ["edgelambda.amazonaws.com"] : [])
     }
   }
 }

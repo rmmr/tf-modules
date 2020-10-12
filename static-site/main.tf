@@ -1,8 +1,3 @@
-provider "aws" {
-  alias  = "us"
-  region = "us-east-1"
-}
-
 module "acm" {
   source  = "terraform-aws-modules/acm/aws"
   version = "~> v2.0"
@@ -11,14 +6,10 @@ module "acm" {
   zone_id     = var.zone_id
 
   tags = var.tags
-
-  providers = {
-    aws = aws.us
-  }
 }
 
 resource "aws_s3_bucket" "_" {
-  bucket = var.bucket_name
+  bucket = var.bucket_name != null ? var.bucket_name : replace(var.domain_name, ".", "_")
   acl    = "public-read"
 
   website {
@@ -73,6 +64,93 @@ resource "aws_cloudfront_distribution" "_" {
     acm_certificate_arn      = module.acm.this_acm_certificate_arn
     ssl_support_method       = "sni-only"
     minimum_protocol_version = "TLSv1.1_2016"
+  }
+
+  dynamic "default_cache_behavior" {
+    for_each = [for k, v in var.cache_behavior : v if k == "default"]
+    iterator = cb
+
+    content {
+      target_origin_id       = cb.value["target_origin_id"]
+      viewer_protocol_policy = cb.value["viewer_protocol_policy"]
+
+      allowed_methods           = lookup(cb.value, "allowed_methods", ["GET", "HEAD", "OPTIONS"])
+      cached_methods            = lookup(cb.value, "cached_methods", ["GET", "HEAD"])
+      compress                  = lookup(cb.value, "compress", null)
+      field_level_encryption_id = lookup(cb.value, "field_level_encryption_id", null)
+      smooth_streaming          = lookup(cb.value, "smooth_streaming", null)
+      trusted_signers           = lookup(cb.value, "trusted_signers", null)
+
+      min_ttl     = lookup(cb.value, "min_ttl", null)
+      default_ttl = lookup(cb.value, "default_ttl", null)
+      max_ttl     = lookup(cb.value, "max_ttl", null)
+
+      forwarded_values {
+        query_string            = lookup(cb.value, "query_string", false)
+        query_string_cache_keys = lookup(cb.value, "query_string_cache_keys", [])
+        headers                 = lookup(cb.value, "headers", null)
+
+        cookies {
+          forward           = lookup(cb.value, "cookies_forward", "none")
+          whitelisted_names = lookup(cb.value, "cookies_whitelisted_names", null)
+        }
+      }
+
+      dynamic "lambda_function_association" {
+        for_each = lookup(cb.value, "lambda_function_association", [])
+        iterator = lfa
+
+        content {
+          event_type   = lfa.key
+          lambda_arn   = lfa.value.lambda_arn
+          include_body = lookup(lfa.value, "include_body", null)
+        }
+      }
+    }
+  }
+
+  dynamic "ordered_cache_behavior" {
+    for_each = [for k, v in var.cache_behavior : v if k != "default"]
+    iterator = cb
+
+    content {
+      path_pattern           = cb.value["path_pattern"]
+      target_origin_id       = cb.value["target_origin_id"]
+      viewer_protocol_policy = cb.value["viewer_protocol_policy"]
+
+      allowed_methods           = lookup(cb.value, "allowed_methods", ["GET", "HEAD", "OPTIONS"])
+      cached_methods            = lookup(cb.value, "cached_methods", ["GET", "HEAD"])
+      compress                  = lookup(cb.value, "compress", null)
+      field_level_encryption_id = lookup(cb.value, "field_level_encryption_id", null)
+      smooth_streaming          = lookup(cb.value, "smooth_streaming", null)
+      trusted_signers           = lookup(cb.value, "trusted_signers", null)
+
+      min_ttl     = lookup(cb.value, "min_ttl", null)
+      default_ttl = lookup(cb.value, "default_ttl", null)
+      max_ttl     = lookup(cb.value, "max_ttl", null)
+
+      forwarded_values {
+        query_string            = lookup(cb.value, "query_string", false)
+        query_string_cache_keys = lookup(cb.value, "query_string_cache_keys", [])
+        headers                 = lookup(cb.value, "headers", null)
+
+        cookies {
+          forward           = lookup(cb.value, "cookies_forward", "none")
+          whitelisted_names = lookup(cb.value, "cookies_whitelisted_names", null)
+        }
+      }
+
+      dynamic "lambda_function_association" {
+        for_each = lookup(cb.value, "lambda_function_association", [])
+        iterator = lfa
+
+        content {
+          event_type   = lfa.key
+          lambda_arn   = lfa.value.lambda_arn
+          include_body = lookup(lfa.value, "include_body", null)
+        }
+      }
+    }
   }
 }
 
