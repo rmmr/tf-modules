@@ -1,8 +1,3 @@
-provider "aws" {
-  alias  = "us_east_1"
-  region = "us-east-1"
-}
-
 resource "aws_cloudwatch_log_group" "lambda" {
   name = "/aws/lambda/${var.function_name}"
 }
