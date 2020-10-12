@@ -28,11 +28,6 @@ variable "env" {
 variable "timeout" {
   type    = number
   default = null
-
-  validation {
-    condition     = ! var.edge || var.timeout <= 5
-    error_message = "Lambda at edge needs timeout <= 5"
-  }
 }
 
 variable "s3_bucket" {
@@ -68,11 +63,6 @@ variable "reserved_concurrent_executions" {
 variable "publish" {
   type    = bool
   default = false
-
-  validation {
-    condition     = ! var.edge || var.publish
-    error_message = "Lambda at edge needs publish=true"
-  }
 }
 
 variable "edge" {

@@ -88,8 +88,8 @@ resource "aws_lambda_function" "this" {
   memory_size                    = var.memory_size
   reserved_concurrent_executions = var.reserved_concurrent_executions
   runtime                        = var.runtime
-  timeout                        = var.timeout
-  publish                        = var.publish
+  timeout                        = var.edge ? min(var.timeout, 5) : var.timeout
+  publish                        = var.publish || var.edge
   role                           = aws_iam_role.lambda.arn
 
   filename         = var.filename
