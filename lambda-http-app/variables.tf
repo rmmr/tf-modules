@@ -81,5 +81,5 @@ variable "handlers" {
 
 variable "allowed_actions" {
   type    = map(map(any))
-  default = []
+  default = {}
 }
