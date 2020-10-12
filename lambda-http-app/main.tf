@@ -64,13 +64,14 @@ module "app_lambda" {
   security_group_ids    = var.security_group_ids
   attach_network_policy = var.subnet_ids != null
 
-  iam_policy_arns = var.iam_policy_arns
 
   filename          = var.package_filename
   s3_bucket         = var.package_s3_bucket
   s3_key            = var.package_s3_key
   s3_object_version = var.package_s3_object_version
   source_code_hash  = var.source_code_hash
+
+  allowed_actions = var.allowed_actions
 
   allowed_triggers = {
     AllowExecutionFromAPIGateway = {
@@ -94,7 +95,7 @@ module "handlers" {
   timeout       = lookup(each.value, "timeout", var.timeout)
   env           = merge(lookup(each.value, "env", {}), var.env)
 
-  iam_policy_arns = lookup(each.value, "iam_policy_arns", var.iam_policy_arns)
+  allow_actions = lookup(each.value, "allow_actions", var.allow_actions)
 
   subnet_ids            = lookup(each.value, "subnet_ids", var.subnet_ids)
   security_group_ids    = lookup(each.value, "security_group_ids", var.security_group_ids)

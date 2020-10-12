@@ -23,6 +23,28 @@ resource "aws_iam_role" "lambda" {
   tags = var.tags
 }
 
+data "aws_iam_policy_document" "lambda" {
+  for_each = var.allowed_actions
+  statement {
+    effect    = "Allow"
+    actions   = lookup(each.value, "actions", [])
+    resources = lookup(each.value, "resources", [])
+  }
+}
+
+resource "aws_iam_policy" "lambda" {
+  for_each = var.allowed_actions
+  name     = "${var.function_name}-${each.key}"
+  policy   = data.aws_iam_policy_document.lambda[each.key].json
+}
+
+resource "aws_iam_policy_attachment" "lambda" {
+  for_each   = var.allowed_actions
+  name       = "${var.function_name}-${each.key}"
+  roles      = [aws_iam_role.lambda.name]
+  policy_arn = aws_iam_policy.lambda[each.key].arn
+}
+
 data "aws_iam_policy_document" "logs" {
   statement {
 
@@ -66,14 +88,6 @@ resource "aws_iam_policy_attachment" "vpc" {
   name       = "${var.function_name}-vpc"
   roles      = [aws_iam_role.lambda.name]
   policy_arn = aws_iam_policy.vpc[0].arn
-}
-
-resource "aws_iam_policy_attachment" "custom" {
-  count = length(var.iam_policy_arns)
-
-  name       = "${var.function_name}-${var.iam_policy_arns[count.index]}"
-  roles      = [aws_iam_role.lambda.name]
-  policy_arn = var.iam_policy_arns[count.index]
 }
 
 resource "aws_lambda_function" "this" {

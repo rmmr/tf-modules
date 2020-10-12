@@ -79,7 +79,7 @@ variable "handlers" {
   default     = {}
 }
 
-variable "iam_policy_arns" {
-  type    = list(string)
+variable "allowed_actions" {
+  type    = map(map(any))
   default = []
 }
