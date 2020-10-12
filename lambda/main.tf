@@ -71,7 +71,7 @@ resource "aws_iam_policy_attachment" "vpc" {
 resource "aws_iam_policy_attachment" "custom" {
   count = length(var.iam_policy_arns)
 
-  name       = "${var.function_name}-custom-${count.index}"
+  name       = "${var.function_name}-${var.iam_policy_arns[count.index]}"
   roles      = [aws_iam_role.lambda.name]
   policy_arn = var.iam_policy_arns[count.index]
 }
