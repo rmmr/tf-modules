@@ -95,7 +95,7 @@ module "handlers" {
   timeout       = lookup(each.value, "timeout", var.timeout)
   env           = merge(lookup(each.value, "env", {}), var.env)
 
-  allow_actions = lookup(each.value, "allow_actions", var.allow_actions)
+  allowed_actions = lookup(each.value, "allowed_actions", var.allowed_actions)
 
   subnet_ids            = lookup(each.value, "subnet_ids", var.subnet_ids)
   security_group_ids    = lookup(each.value, "security_group_ids", var.security_group_ids)
