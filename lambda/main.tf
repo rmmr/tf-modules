@@ -109,8 +109,10 @@ resource "aws_lambda_function" "this" {
   s3_object_version = var.s3_object_version
 
   dynamic "environment" {
-    for_each  = var.env != null ? [true] : []
-    variables = var.env
+    for_each = var.env != null ? [true] : []
+    content {
+      variables = var.env
+    }
   }
 
   dynamic "vpc_config" {
