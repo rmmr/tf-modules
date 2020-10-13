@@ -2,6 +2,10 @@ locals {
   s3_origin_id = "${var.domain_name}-origin"
 }
 
+data "aws_region" "current" {
+
+}
+
 module "acm" {
   source  = "terraform-aws-modules/acm/aws"
   version = "~> v2.0"
@@ -21,7 +25,8 @@ resource "aws_s3_bucket" "_" {
 
 resource "aws_cloudfront_distribution" "_" {
   origin {
-    domain_name = aws_s3_bucket._.bucket_regional_domain_name
+    // workaround for https://github.com/terraform-providers/terraform-provider-aws/issues/15102
+    domain_name = "${aws_s3_bucket._.bucket}.s3.${aws_region.current.name}.amazonaws.com"
     origin_id   = local.s3_origin_id
   }
 
