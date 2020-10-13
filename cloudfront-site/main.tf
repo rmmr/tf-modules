@@ -16,11 +16,6 @@ resource "aws_s3_bucket" "_" {
   bucket = var.bucket_name != null ? var.bucket_name : replace(var.domain_name, ".", "-")
   acl    = "public-read"
 
-  website {
-    index_document = "index.html"
-    error_document = "error.html"
-  }
-
   tags = var.tags
 }
 
