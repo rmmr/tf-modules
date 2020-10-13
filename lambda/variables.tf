@@ -22,7 +22,7 @@ variable "memory_size" {
 
 variable "env" {
   type    = map(string)
-  default = {}
+  default = null
 }
 
 variable "timeout" {
