@@ -1,6 +1,6 @@
 locals {
-  log_group_arn_regional = element(concat(aws_cloudwatch_log_group.lambda.*.arn, [""]), 0)
-  log_group_arn          = var.edge ? format("arn:%s:%s:%s:%s:%s", data.aws_arn.log_group_arn[0].partition, data.aws_arn.log_group_arn[0].service, "*", data.aws_arn.log_group_arn[0].account, data.aws_arn.log_group_arn[0].resource) : local.log_group_arn_regional
+  log_group_arn_regional = aws_cloudwatch_log_group.lambda.arn
+  log_group_arn          = var.edge ? format("arn:%s:%s:%s:%s:%s", data.aws_arn.log_group_arn.partition, data.aws_arn.log_group_arn.service, "*", data.aws_arn.log_group_arn.account, data.aws_arn.log_group_arn.resource) : local.log_group_arn_regional
 }
 
 data "aws_arn" "log_group_arn" {
