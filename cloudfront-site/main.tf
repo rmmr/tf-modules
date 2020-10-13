@@ -26,7 +26,7 @@ resource "aws_s3_bucket" "_" {
 resource "aws_cloudfront_distribution" "_" {
   origin {
     // workaround for https://github.com/terraform-providers/terraform-provider-aws/issues/15102
-    domain_name = "${aws_s3_bucket._.bucket}.s3.${aws_region.current.name}.amazonaws.com"
+    domain_name = "${aws_s3_bucket._.bucket}.s3.${data.aws_region.current.name}.amazonaws.com"
     origin_id   = local.s3_origin_id
   }
 
