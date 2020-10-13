@@ -30,8 +30,3 @@ variable "cache_behavior" {
   type    = any
   default = null
 }
-
-variable "paths" {
-  type    = any
-  default = null
-}

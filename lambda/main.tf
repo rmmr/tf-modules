@@ -1,3 +1,13 @@
+locals {
+  log_group_arn_regional = element(concat(data.aws_cloudwatch_log_group.lambda.*.arn, aws_cloudwatch_log_group.lambda.*.arn, [""]), 0)
+  log_group_arn          = var.edge ? format("arn:%s:%s:%s:%s:%s", data.aws_arn.log_group_arn[0].partition, data.aws_arn.log_group_arn[0].service, "*", data.aws_arn.log_group_arn[0].account, data.aws_arn.log_group_arn[0].resource) : local.log_group_arn_regional
+}
+
+data "aws_arn" "log_group_arn" {
+  arn = local.log_group_arn_regional
+}
+
+
 resource "aws_cloudwatch_log_group" "lambda" {
   name = "/aws/lambda/${var.function_name}"
 }
@@ -54,7 +64,7 @@ data "aws_iam_policy_document" "logs" {
       "logs:PutLogEvents",
     ]
 
-    resources = flatten([for _, v in ["%v:*", "%v:*:*"] : format(v, aws_cloudwatch_log_group.lambda.arn)])
+    resources = flatten([for _, v in ["%v:*", "%v:*:*"] : format(v, local.log_group_arn)])
   }
 }
 

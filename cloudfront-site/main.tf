@@ -13,7 +13,7 @@ module "acm" {
 }
 
 resource "aws_s3_bucket" "_" {
-  bucket = var.bucket_name != null ? var.bucket_name : replace(var.domain_name, ".", "-")
+  bucket = var.bucket_name != null ? var.bucket_name : replace(var.domain_name, ".", "_")
   acl    = "public-read"
 
   website {
@@ -26,7 +26,7 @@ resource "aws_s3_bucket" "_" {
 
 resource "aws_cloudfront_distribution" "_" {
   origin {
-    domain_name = aws_s3_bucket._.bucket_domain_name
+    domain_name = aws_s3_bucket._.bucket_regional_domain_name
     origin_id   = local.s3_origin_id
   }
 
