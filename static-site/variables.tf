@@ -17,6 +17,6 @@ variable "tags" {
 }
 
 variable "cache_behavior" {
-  type    = map(map(any))
+  type    = map(any)
   default = {}
 }
