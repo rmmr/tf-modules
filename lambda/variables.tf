@@ -95,6 +95,11 @@ variable "allowed_triggers" {
   default = {}
 }
 
+variable "provisioned_concurrent_executions" {
+  type    = number
+  default = -1
+}
+
 variable "allowed_actions" {
   type    = map(map(any))
   default = {}

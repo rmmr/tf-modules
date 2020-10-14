@@ -150,3 +150,11 @@ resource "aws_lambda_permission" "triggers" {
   event_source_token = lookup(each.value, "event_source_token", null)
 }
 
+resource "aws_lambda_provisioned_concurrency_config" "current_version" {
+  count = var.provisioned_concurrent_executions > -1 ? 1 : 0
+
+  function_name = aws_lambda_function.this.function_name
+  qualifier     = aws_lambda_function.this.version
+
+  provisioned_concurrent_executions = var.provisioned_concurrent_executions
+}

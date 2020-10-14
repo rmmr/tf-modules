@@ -79,6 +79,11 @@ variable "handlers" {
   default     = {}
 }
 
+variable "provisioned_concurrent_executions" {
+  type    = number
+  default = null
+}
+
 variable "allowed_actions" {
   type    = map(map(any))
   default = {}

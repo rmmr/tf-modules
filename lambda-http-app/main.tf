@@ -64,7 +64,6 @@ module "app_lambda" {
   security_group_ids    = var.security_group_ids
   attach_network_policy = var.subnet_ids != null
 
-
   filename          = var.package_filename
   s3_bucket         = var.package_s3_bucket
   s3_key            = var.package_s3_key
@@ -72,6 +71,8 @@ module "app_lambda" {
   source_code_hash  = var.source_code_hash
 
   allowed_actions = var.allowed_actions
+
+  provisioned_concurrent_executions = var.provisioned_concurrent_executions
 
   allowed_triggers = {
     AllowExecutionFromAPIGateway = {
