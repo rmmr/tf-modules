@@ -13,8 +13,7 @@ data "null_data_source" "_" {
 
 resource "null_resource" "_" {
   triggers = {
-    // Will cause this resource to be applied twice in order to settle. But prevents file from not existing.
-    output_file_hash              = fileexists(local.abs_output_file) ? filemd5(local.abs_output_file) : null
+    output_file_hash              = fileexists(local.abs_output_file) ? "exists" : null
     setup_file_has_changed        = fileexists("${local.abs_source_dir}/setup.py") ? filemd5("${local.abs_source_dir}/setup.py") : null
     requirements_file_has_changed = fileexists("${local.abs_source_dir}/requirements.txt") ? filemd5("${local.abs_source_dir}/requirements.txt") : null
   }
