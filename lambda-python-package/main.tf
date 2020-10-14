@@ -15,7 +15,7 @@ resource "null_resource" "_" {
   triggers = {
     // This trigger will cause this resource to be initially applied twice,
     // however it ensures that the build file will be created if not present.
-    output_file_hash              = fileexists(local.abs_output_file) ? "true" : "false"
+    output_file_exists            = fileexists(local.abs_output_file) ? "true" : "false"
     setup_file_has_changed        = fileexists("${local.abs_source_dir}/setup.py") ? filemd5("${local.abs_source_dir}/setup.py") : null
     requirements_file_has_changed = fileexists("${local.abs_source_dir}/requirements.txt") ? filemd5("${local.abs_source_dir}/requirements.txt") : null
   }
