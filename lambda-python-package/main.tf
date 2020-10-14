@@ -13,7 +13,7 @@ data "null_data_source" "_" {
 
 resource "null_resource" "_" {
   triggers = {
-    output_file_hash              = fileexists(local.abs_output_file) ? "exists" : null
+    output_file_hash              = fileexists(local.abs_output_file) ? null : "trigger"
     setup_file_has_changed        = fileexists("${local.abs_source_dir}/setup.py") ? filemd5("${local.abs_source_dir}/setup.py") : null
     requirements_file_has_changed = fileexists("${local.abs_source_dir}/requirements.txt") ? filemd5("${local.abs_source_dir}/requirements.txt") : null
   }
