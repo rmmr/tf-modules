@@ -63,6 +63,16 @@ variable "memory_size" {
   default = 512
 }
 
+variable "publish" {
+  type    = bool
+  default = null
+}
+
+variable "provisioned_concurrent_executions" {
+  type    = number
+  default = null
+}
+
 variable "tags" {
   type    = map(string)
   default = {}
@@ -77,11 +87,6 @@ variable "handlers" {
   description = "Map of additional handlers to configure."
   type        = map
   default     = {}
-}
-
-variable "provisioned_concurrent_executions" {
-  type    = number
-  default = null
 }
 
 variable "allowed_actions" {
