@@ -34,6 +34,8 @@ resource "aws_cloudfront_distribution" "_" {
   aliases     = [var.domain_name]
   price_class = var.price_class
 
+  default_root_object = var.default_root_object
+
   restrictions {
     geo_restriction {
       restriction_type = "none"

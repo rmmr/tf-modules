@@ -26,6 +26,11 @@ variable "tags" {
   default = {}
 }
 
+variable "default_root_object" {
+  type    = string
+  default = null
+}
+
 variable "cache_behavior" {
   type    = any
   default = null
