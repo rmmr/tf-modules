@@ -150,6 +150,19 @@ resource "aws_lambda_permission" "triggers" {
   event_source_token = lookup(each.value, "event_source_token", null)
 }
 
+resource "aws_lambda_permission" "unqualified_alias_triggers" {
+  for_each = var.publish ? var.allowed_triggers : {}
+
+  function_name = aws_lambda_function.this.function_name
+
+  statement_id       = lookup(each.value, "statement_id", each.key)
+  action             = lookup(each.value, "action", "lambda:InvokeFunction")
+  principal          = lookup(each.value, "principal", format("%s.amazonaws.com", lookup(each.value, "service", "")))
+  source_arn         = lookup(each.value, "source_arn", null)
+  source_account     = lookup(each.value, "source_account", null)
+  event_source_token = lookup(each.value, "event_source_token", null)
+}
+
 resource "aws_lambda_provisioned_concurrency_config" "current_version" {
   count = var.provisioned_concurrent_executions > -1 ? 1 : 0
 
