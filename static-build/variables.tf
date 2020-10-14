@@ -1,18 +1,19 @@
 variable "cmd" {
-  type = "string"
+  type = string
 }
 
 variable "output_dir" {
-  type = "string"
+  type = string
 }
 
 variable "cwd" {
-  type    = "string"
+  type    = string
   default = null
 }
 
 variable "triggers" {
-  type = map(string)
+  type    = map(string)
+  default = null
 }
 
 variable env {
