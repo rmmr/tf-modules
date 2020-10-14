@@ -1,4 +1,4 @@
-local {
+locals {
   abs_output_dir = abspath(var.output_dir)
 }
 
