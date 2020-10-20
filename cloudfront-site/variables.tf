@@ -26,7 +26,7 @@ variable "tags" {
   default = {}
 }
 
-variable "default_root_object" {
+variable "index_document" {
   type    = string
   default = null
 }

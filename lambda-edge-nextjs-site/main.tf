@@ -48,7 +48,7 @@ locals {
   }
 }
 
-module "paths" {
+module "s3_objects" {
   source = "../s3-sync"
   bucket = module.site.bucket
   objects = {

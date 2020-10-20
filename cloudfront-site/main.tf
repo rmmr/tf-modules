@@ -20,6 +20,14 @@ resource "aws_s3_bucket" "_" {
   bucket = var.bucket_name != null ? var.bucket_name : replace(var.domain_name, ".", "-")
   acl    = "public-read"
 
+  dynamic "website" {
+    for_each = var.index_document != null ? [] : [true]
+
+    content {
+      index_document = var.index_document
+    }
+  }
+
   tags = var.tags
 }
 
@@ -34,7 +42,7 @@ resource "aws_cloudfront_distribution" "_" {
   aliases     = [var.domain_name]
   price_class = var.price_class
 
-  default_root_object = var.default_root_object
+  default_root_object = var.index_document
 
   restrictions {
     geo_restriction {
