@@ -44,16 +44,32 @@ resource "aws_cloudfront_distribution" "_" {
 
   default_root_object = var.index_document
 
-  restrictions {
-    geo_restriction {
-      restriction_type = "none"
-    }
-  }
-
   viewer_certificate {
     acm_certificate_arn      = module.acm.this_acm_certificate_arn
     ssl_support_method       = "sni-only"
     minimum_protocol_version = "TLSv1.1_2016"
+  }
+
+  dynamic "custom_error_response" {
+    for_each = var.custom_error_response
+    content {
+      error_code = custom_error_response.value["error_code"]
+
+      response_code         = lookup(custom_error_response.value, "response_code", null)
+      response_page_path    = lookup(custom_error_response.value, "response_page_path", null)
+      error_caching_min_ttl = lookup(custom_error_response.value, "error_caching_min_ttl", null)
+    }
+  }
+
+  restrictions {
+    dynamic "geo_restriction" {
+      for_each = [var.geo_restriction]
+
+      content {
+        restriction_type = lookup(geo_restriction.value, "restriction_type", "none")
+        locations        = lookup(geo_restriction.value, "locations", [])
+      }
+    }
   }
 
   dynamic "default_cache_behavior" {

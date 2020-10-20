@@ -35,3 +35,13 @@ variable "cache_behavior" {
   type    = any
   default = null
 }
+
+variable "custom_error_response" {
+  type    = any
+  default = {}
+}
+
+variable "geo_restriction" {
+  type    = any
+  default = {}
+}
