@@ -21,7 +21,7 @@ resource "aws_s3_bucket" "_" {
   acl    = "public-read"
 
   dynamic "website" {
-    for_each = var.index_document != null ? [] : [true]
+    for_each = var.index_document != null ? [true] : []
 
     content {
       index_document = var.index_document
