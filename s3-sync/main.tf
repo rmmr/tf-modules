@@ -3,8 +3,18 @@ locals {
     svg = "image/svg+xml"
   }
 
-  objects_with_content_types = {
+  objects_with_etag = {
     for key, object in var.objects :
+    key => merge(
+      object,
+      lookup(object, "etag", null) == null && lookup(object, "source", null) != null
+      ? { etag = fileexists(object.source) ? filemd5(object.source) : null }
+      : {},
+    )
+  }
+
+  objects_with_content_types = {
+    for key, object in local.objects_with_etag :
     key => merge(
       object,
       lookup(object, "content_type", null) == null && lookup(object, "source", null) != null
@@ -35,7 +45,7 @@ resource "null_resource" "_" {
   triggers = {
     bucket       = var.bucket
     region       = data.aws_region.current.name
-    objects_hash = sha256(jsonencode(var.objects))
+    objects_hash = sha256(jsonencode(local.objects))
   }
 
   provisioner "local-exec" {
