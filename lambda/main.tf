@@ -43,10 +43,9 @@ data "aws_iam_policy_document" "lambda" {
 }
 
 resource "aws_iam_policy" "lambda" {
-  depends_on = [data.aws_iam_policy_document.lambda]
-  for_each   = var.allowed_actions
-  name       = "${var.function_name}-${each.key}"
-  policy     = data.aws_iam_policy_document.lambda[each.key].json
+  for_each = var.allowed_actions
+  name     = "${var.function_name}-${each.key}"
+  policy   = ""
 }
 
 resource "aws_iam_policy_attachment" "lambda" {
