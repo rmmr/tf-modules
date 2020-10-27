@@ -45,7 +45,21 @@ data "aws_iam_policy_document" "lambda" {
 resource "aws_iam_policy" "lambda" {
   for_each = var.allowed_actions
   name     = "${var.function_name}-${each.key}"
-  policy   = ""
+  policy   = <<EOF
+{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Action": [
+        "ec2:Describe*"
+      ],
+      "Effect": "Allow",
+      "Resource": "*"
+    }
+  ]
+}
+EOF
+
 }
 
 resource "aws_iam_policy_attachment" "lambda" {
