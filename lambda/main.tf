@@ -34,39 +34,25 @@ resource "aws_iam_role" "lambda" {
 }
 
 data "aws_iam_policy_document" "lambda" {
-  for_each = var.allowed_actions
-  statement {
-    effect    = "Allow"
-    actions   = lookup(each.value, "actions", null)
-    resources = lookup(each.value, "resources", null)
+  dynamic "statement" {
+    for_each = var.allowed_actions
+    content {
+      effect    = "Allow"
+      actions   = lookup(statement.value, "actions", null)
+      resources = lookup(statement.value, "resources", null)
+    }
   }
 }
 
 resource "aws_iam_policy" "lambda" {
-  for_each = var.allowed_actions
-  name     = "${var.function_name}-${each.key}"
-  policy   = <<EOF
-{
-  "Version": "2012-10-17",
-  "Statement": [
-    {
-      "Action": [
-        "ec2:Describe*"
-      ],
-      "Effect": "Allow",
-      "Resource": "*"
-    }
-  ]
-}
-EOF
-
+  name   = var.function_name
+  policy = data.aws_iam_policy_document.lambda.json
 }
 
 resource "aws_iam_policy_attachment" "lambda" {
-  for_each   = var.allowed_actions
-  name       = "${var.function_name}-${each.key}"
+  name       = var.function_name
   roles      = [aws_iam_role.lambda.name]
-  policy_arn = aws_iam_policy.lambda[each.key].arn
+  policy_arn = aws_iam_policy.lambda.arn
 }
 
 data "aws_iam_policy_document" "logs" {
