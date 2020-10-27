@@ -6,7 +6,8 @@ locals {
   package        = fileexists("${local.abs_source_dir}/package.json") ? jsondecode(file("${local.abs_source_dir}/package.json")) : null
   extra_dependencies = merge(
     {
-      "@sls-next/lambda-at-edge" : "1.7.0-alpha.20"
+      "@sls-next/lambda-at-edge" : "1.7.0-alpha.20",
+      "klaw" : "^3.0.0"
     },
     local.package != null ? lookup(local.package, "peerDependencies", {}) : {},
     var.extra_dependencies
