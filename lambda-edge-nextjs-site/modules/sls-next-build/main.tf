@@ -19,7 +19,7 @@ locals {
     for filename in local.content_files :
     {
       filename = filename
-      hash     = filemd5(filename)
+      hash     = filemd5("${local.abs_content_dir}/${filename}")
     }
   ]
 
