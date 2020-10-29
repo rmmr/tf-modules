@@ -70,6 +70,7 @@ module "build" {
   source = "./modules/sls-next-build"
 
   source_dir         = var.source_dir
+  content_dir        = var.content_dir
   output_dir         = var.build_dir
   extra_dependencies = var.extra_dependencies
   npm_config         = var.npm_config

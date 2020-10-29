@@ -6,6 +6,11 @@ variable "source_dir" {
   type = string
 }
 
+variable "content_dir" {
+  type    = string
+  default = null
+}
+
 variable "build_dir" {
   type = string
 }
