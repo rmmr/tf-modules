@@ -14,7 +14,7 @@ locals {
     var.extra_dependencies
   )
 
-  content_files = local.abs_content_dir != null ? fileset(var.abs_content_dir, "**") : []
+  content_files = local.abs_content_dir != null ? fileset(local.abs_content_dir, "**") : []
   content_files_with_hash = [
     for filename in local.content_files :
     {
