@@ -42,9 +42,11 @@ locals {
     }"
   } : null
 
+  assets_dir = "${module.build.output_dir}/.serverless_next/assets"
+
   public_paths = {
-    for filename in fileset(var.source_dir, "public/**") :
-    filename => "${var.source_dir}/${filename}"
+    for filename in fileset(local.assets_dir, "public/**") :
+    filename => "${local.assets_dir}/${filename}"
   }
 }
 
