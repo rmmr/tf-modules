@@ -1,9 +1,10 @@
 locals {
-  build_dir      = "/tmp/build"
-  abs_output_dir = abspath(var.output_dir)
-  abs_source_dir = abspath(var.source_dir)
-  abs_module_dir = abspath(path.module)
-  package        = fileexists("${local.abs_source_dir}/package.json") ? jsondecode(file("${local.abs_source_dir}/package.json")) : null
+  build_dir       = "/tmp/build"
+  abs_output_dir  = abspath(var.output_dir)
+  abs_source_dir  = abspath(var.source_dir)
+  abs_content_dir = var.content_dir != null ? abspath(var.content_dir) : null
+  abs_module_dir  = abspath(path.module)
+  package         = fileexists("${local.abs_source_dir}/package.json") ? jsondecode(file("${local.abs_source_dir}/package.json")) : null
   extra_dependencies = merge(
     {
       "@sls-next/lambda-at-edge" : "1.7.0-alpha.20",
@@ -12,6 +13,15 @@ locals {
     local.package != null ? lookup(local.package, "peerDependencies", {}) : {},
     var.extra_dependencies
   )
+
+  content_files = local.abs_content_dir != null ? fileset(var.abs_content_dir, "**") : []
+  content_files_with_hash = [
+    for filename in local.content_files :
+    {
+      filename = filename
+      hash     = filemd5(filename)
+    }
+  ]
 
   npmrc = var.npm_config
 }
@@ -29,6 +39,7 @@ resource "null_resource" "_" {
     // however it ensures that the build file will be created if not present.
     output_files_exist       = fileexists("${local.abs_output_dir}/default-lambda.zip") && fileexists("${local.abs_output_dir}/api-lambda.zip") ? "true" : "false"
     package_file_has_changed = fileexists("${local.abs_source_dir}/package.json") ? filemd5("${local.abs_source_dir}/package.json") : null
+    content_files_hash       = local.abs_content_dir != null ? sha256(jsonencode(local.content_files_with_hash)) : null
   }
 
   provisioner "local-exec" {
@@ -39,14 +50,15 @@ resource "null_resource" "_" {
         -v ${local.abs_source_dir}:/var/task \
         -v ${local.abs_module_dir}/data:/var/tf-data \
         -v ${local.abs_output_dir}:/var/output \
+        ${local.abs_content_dir != null ? "-v ${local.abs_content_dir}:/var/site-content" : ""} \
         "lambci/lambda:build-nodejs12.x" \
         /bin/bash -c "
             set -e; \
             cd /var/output && shopt -s dotglob && eval 'rm -r ./*' && shopt -u dotglob; \
             echo \"${local.npmrc}\" > ~/.npmrc; \
             mkdir -p /tmp/build; \
-            cd /var/task; \
-            shopt -s extglob && eval 'cp -r !(node_modules|.next|.env) /tmp/build/' && shopt -u extglob; \
+            cd /var/task; shopt -s extglob && eval 'cp -r !(node_modules|.next|.env) /tmp/build/' && shopt -u extglob; \
+            ${local.abs_content_dir != null ? " cd /var/site-content; shopt -s extglob && eval 'cp -rf !(node_modules|.next|.env|.gitignore) /tmp/build/' && shopt -u extglob;" : ""} \
             cp -r /var/tf-data/. /tmp/build/; \
             cd /tmp/build; \
             npm install; \

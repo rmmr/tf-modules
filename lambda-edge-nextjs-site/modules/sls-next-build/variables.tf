@@ -2,6 +2,11 @@ variable "source_dir" {
   type = string
 }
 
+variable "content_dir" {
+  type    = string
+  default = null
+}
+
 variable "output_dir" {
   type = string
 }
