@@ -81,7 +81,7 @@ module "build" {
 
 
 module "default_lambda" {
-  source = "git@github.com:rmmr/tf-modules.git//lambda"
+  source = "../lambda"
 
   function_name = "${var.name}-default"
   handler       = "index.handler"
@@ -105,7 +105,7 @@ module "default_lambda" {
 }
 
 module "api_lambda" {
-  source = "git@github.com:rmmr/tf-modules.git//lambda"
+  source = "../lambda"
 
   function_name = "${var.name}-api"
   handler       = "index.handler"
@@ -130,7 +130,7 @@ module "api_lambda" {
 
 
 module "site" {
-  source      = "git@github.com:rmmr/tf-modules.git//cloudfront-site"
+  source      = "../cloudfront-site"
   zone_id     = var.zone_id
   domain_name = var.domain_name
   bucket_name = var.bucket_name
