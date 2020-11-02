@@ -90,7 +90,6 @@ module "default_lambda" {
   timeout       = 30
   edge          = true
   publish       = true
-  env           = var.env
 
   allowed_actions = {
     AllowS3Access = {
@@ -115,7 +114,6 @@ module "api_lambda" {
   timeout       = var.timeout
   edge          = true
   publish       = true
-  env           = var.env
 
   allowed_actions = {
     AllowS3Access = {
