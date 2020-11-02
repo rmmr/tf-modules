@@ -194,6 +194,9 @@ module "site" {
       default_ttl = 0
       max_ttl     = 31536000
 
+      query_string    = true
+      cookies_forward = "all"
+
       allowed_methods = [
         "HEAD",
         "DELETE",
