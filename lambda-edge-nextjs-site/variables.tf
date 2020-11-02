@@ -53,6 +53,11 @@ variable "npm_config" {
   default = ""
 }
 
+variable "custom_headers" {
+  type    = list(string)
+  default = null
+}
+
 variable "env" {
   type    = map(string)
   default = {}
