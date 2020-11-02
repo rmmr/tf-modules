@@ -206,7 +206,8 @@ module "site" {
 
       lambda_function_association = {
         origin-request = {
-          lambda_arn = module.api_lambda.this_lambda_function_qualified_arn
+          lambda_arn   = module.api_lambda.this_lambda_function_qualified_arn
+          include_body = true
         }
       }
     }
