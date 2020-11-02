@@ -144,6 +144,7 @@ module "site" {
       query_string    = true
       cookies_forward = "all"
       compress        = true
+      headers         = ["*"]
 
       allowed_methods = [
         "HEAD",
@@ -196,6 +197,7 @@ module "site" {
 
       query_string    = true
       cookies_forward = "all"
+      headers         = ["*"]
 
       allowed_methods = [
         "HEAD",
