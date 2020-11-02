@@ -7,7 +7,6 @@ data "aws_arn" "log_group_arn" {
   arn = local.log_group_arn_regional
 }
 
-
 resource "aws_cloudwatch_log_group" "lambda" {
   name = "/aws/lambda/${var.function_name}"
 }
