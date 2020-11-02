@@ -7,7 +7,7 @@ locals {
   package         = fileexists("${local.abs_source_dir}/package.json") ? jsondecode(file("${local.abs_source_dir}/package.json")) : null
   extra_dependencies = merge(
     {
-      "@sls-next/lambda-at-edge" : "1.7.0-alpha.20",
+      "@sls-next/lambda-at-edge" : "1.7.0",
       "klaw" : "^3.0.0"
     },
     local.package != null ? lookup(local.package, "peerDependencies", {}) : {},
@@ -40,6 +40,7 @@ resource "null_resource" "_" {
     output_files_exist       = fileexists("${local.abs_output_dir}/default-lambda.zip") && fileexists("${local.abs_output_dir}/api-lambda.zip") ? "true" : "false"
     package_file_has_changed = fileexists("${local.abs_source_dir}/package.json") ? filemd5("${local.abs_source_dir}/package.json") : null
     content_files_hash       = local.abs_content_dir != null ? sha256(jsonencode(local.content_files_with_hash)) : null
+    env_has_changed          = sha256(jsonencode(var.env))
   }
 
   provisioner "local-exec" {
