@@ -37,3 +37,7 @@ output "pages_manifest_file" {
 output "prerender_manifest_file" {
   value = "${data.null_data_source._.outputs["output_dir"]}/.next/prerender-manifest.json"
 }
+
+output "triggers" {
+  value = null_resource._.triggers
+}
