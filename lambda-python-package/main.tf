@@ -19,18 +19,18 @@ resource "null_resource" "_" {
 
   provisioner "local-exec" {
     command = <<EOF
-    set -e; \
-    mkdir -p ${dirname(local.abs_output_file)}; \
+    set -e;
+    mkdir -p ${dirname(local.abs_output_file)};
     docker run \
         ${join(" ", [for k, v in var.env : "-e ${k}=${v}"])}\
         -v ${local.abs_source_dir}:/var/task \
         "lambci/lambda:build-python3.7" \
         /bin/bash -c "
-            set -e; \ 
-            mkdir -p /tmp/build; \
-            ${fileexists("${local.abs_source_dir}/setup.py") ? "pip install . -t /tmp/build > /dev/null 2>&1;" : ""}\
-            ${fileexists("${local.abs_source_dir}/requirements.txt") ? "pip install -r requirements.txt -t /tmp/build > /dev/null 2>&1;" : ""}\
-            cd /tmp/build && zip -r9  - .; \
+            set -e;
+            mkdir -p /tmp/build;
+            ${fileexists("${local.abs_source_dir}/setup.py") ? "pip install . -t /tmp/build > /dev/null 2>&1;" : ""}
+            ${fileexists("${local.abs_source_dir}/requirements.txt") ? "pip install -r requirements.txt -t /tmp/build > /dev/null 2>&1;" : ""}
+            cd /tmp/build && zip -r9  - .;
             exit;" > ${local.abs_output_file}
     EOF
   }
