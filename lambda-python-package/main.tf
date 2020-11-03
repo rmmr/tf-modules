@@ -15,6 +15,7 @@ resource "null_resource" "_" {
   triggers = {
     setup_file_has_changed        = fileexists("${local.abs_source_dir}/setup.py") ? filemd5("${local.abs_source_dir}/setup.py") : null
     requirements_file_has_changed = fileexists("${local.abs_source_dir}/requirements.txt") ? filemd5("${local.abs_source_dir}/requirements.txt") : null
+    env_has_changed               = sha256(jsonencode(var.env))
   }
 
   provisioner "local-exec" {
