@@ -13,21 +13,20 @@ data "null_data_source" "_" {
 
 resource "null_resource" "_" {
   triggers = {
-    // This trigger will cause this resource to be initially applied twice,
-    // however it ensures that the build file will be created if not present.
-    output_file_exists            = fileexists(local.abs_output_file) ? "true" : "false"
     setup_file_has_changed        = fileexists("${local.abs_source_dir}/setup.py") ? filemd5("${local.abs_source_dir}/setup.py") : null
     requirements_file_has_changed = fileexists("${local.abs_source_dir}/requirements.txt") ? filemd5("${local.abs_source_dir}/requirements.txt") : null
   }
 
   provisioner "local-exec" {
     command = <<EOF
-    mkdir -p ${dirname(local.abs_output_file)}
+    set -e; \
+    mkdir -p ${dirname(local.abs_output_file)}; \
     docker run \
         ${join(" ", [for k, v in var.env : "-e ${k}=${v}"])}\
         -v ${local.abs_source_dir}:/var/task \
         "lambci/lambda:build-python3.7" \
         /bin/sh -c "
+            set -e; \ 
             mkdir -p /tmp/build; \
             ${fileexists("${local.abs_source_dir}/setup.py") ? "pip install . -t /tmp/build > /dev/null 2>&1;" : ""}\
             ${fileexists("${local.abs_source_dir}/requirements.txt") ? "pip install -r requirements.txt -t /tmp/build > /dev/null 2>&1;" : ""}\

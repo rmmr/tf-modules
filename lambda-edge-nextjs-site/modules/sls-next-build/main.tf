@@ -35,9 +35,6 @@ data "null_data_source" "_" {
 
 resource "null_resource" "_" {
   triggers = {
-    // This trigger will cause this resource to be initially applied twice,
-    // however it ensures that the build file will be created if not present.
-    output_files_exist       = fileexists("${local.abs_output_dir}/default-lambda.zip") && fileexists("${local.abs_output_dir}/api-lambda.zip") ? "true" : "false"
     package_file_has_changed = fileexists("${local.abs_source_dir}/package.json") ? filemd5("${local.abs_source_dir}/package.json") : null
     content_files_hash       = local.abs_content_dir != null ? sha256(jsonencode(local.content_files_with_hash)) : null
     env_has_changed          = sha256(jsonencode(var.env))
@@ -45,7 +42,8 @@ resource "null_resource" "_" {
 
   provisioner "local-exec" {
     command = <<EOF
-    mkdir -p ${local.abs_output_dir}
+    set -e; \
+    mkdir -p ${local.abs_output_dir}; \
     docker run \
         ${join(" ", [for k, v in var.env : "-e ${k}=${v}"])}\
         -v ${local.abs_source_dir}:/var/task \
