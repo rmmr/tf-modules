@@ -141,10 +141,11 @@ module "site" {
       default_ttl = 0
       max_ttl     = 31536000
 
-      query_string    = true
-      cookies_forward = "all"
-      compress        = true
-      headers         = var.custom_headers
+      query_string           = true
+      cookies_forward        = "all"
+      compress               = true
+      headers                = var.custom_headers
+      viewer_protocol_policy = "redirect-to-https"
 
       allowed_methods = [
         "HEAD",
@@ -175,6 +176,7 @@ module "site" {
 
       query_string    = false
       cookies_forward = "none"
+
     }
 
     static = {
@@ -195,9 +197,10 @@ module "site" {
       default_ttl = 0
       max_ttl     = 31536000
 
-      query_string    = true
-      cookies_forward = "all"
-      headers         = var.custom_headers
+      query_string           = true
+      cookies_forward        = "all"
+      headers                = var.custom_headers
+      viewer_protocol_policy = "redirect-to-https"
 
       allowed_methods = [
         "HEAD",
@@ -224,9 +227,10 @@ module "site" {
       default_ttl = 0
       max_ttl     = 31536000
 
-      query_string    = true
-      cookies_forward = "all"
-      headers         = var.custom_headers
+      query_string           = true
+      cookies_forward        = "all"
+      headers                = var.custom_headers
+      viewer_protocol_policy = "redirect-to-https"
 
       allowed_methods = ["HEAD", "GET"]
 
