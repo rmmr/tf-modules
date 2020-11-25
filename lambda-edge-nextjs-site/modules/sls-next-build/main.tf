@@ -44,6 +44,7 @@ resource "null_resource" "_" {
     command = <<EOF
     mkdir -p ${local.abs_output_dir}
     docker run \
+        --rm \
         ${join(" ", [for k, v in var.env : "-e ${k}=${v}"])}\
         -v ${local.abs_source_dir}:/var/task \
         -v ${local.abs_module_dir}/data:/var/tf-data \
