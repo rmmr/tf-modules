@@ -20,12 +20,12 @@ module "build" {
 
 data "archive_file" "default_lambda_package" {
   type        = "zip"
-  source_path = "${var.source_dir}/.serverless_next/default-lambda"
+  source_dir  = "${var.source_dir}/.serverless_next/default-lambda"
   output_path = "${var.source_dir}/.serverless_next/default-lambda.zip"
 }
 
 data "archive_file" "api_lambda_package" {
   type        = "zip"
-  source_path = "${var.source_dir}/.serverless_next/api-lambda"
+  source_dir  = "${var.source_dir}/.serverless_next/api-lambda"
   output_path = "${var.source_dir}/.serverless_next/api-lambda.zip"
 }
