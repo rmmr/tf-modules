@@ -1,20 +1,31 @@
 locals {
-  runtime                 = "nodejs${var.nodejs_version}"
-  routes_manifest         = fileexists(module.build.routes_manifest_file) ? jsondecode(file(module.build.routes_manifest_file)) : null
-  default_lambda_manifest = fileexists(module.build.default_lambda_manifest_file) ? jsondecode(file(module.build.default_lambda_manifest_file)) : null
-  api_lambda_manifest     = fileexists(module.build.api_lambda_manifest_file) ? jsondecode(file(module.build.api_lambda_manifest_file)) : null
-  pages_manifest          = fileexists(module.build.pages_manifest_file) ? jsondecode(file(module.build.pages_manifest_file)) : null
-  prerender_manifest      = fileexists(module.build.prerender_manifest_file) ? jsondecode(file(module.build.prerender_manifest_file)) : null
-  base_path               = local.routes_manifest != null ? (length(local.routes_manifest.basePath) > 0 ? "${substr(local.routes_manifest.basePath, 1, length(local.routes_manifest.basePath))}/" : "") : ""
+  runtime = "nodejs${var.nodejs_version}"
+
+  default_lambda_manifest_file =   "${var.serverless_next_dir}/default-lambda/manifest.json"
+  default_lambda_manifest      = fileexists(local.default_lambda_manifest_file) ? jsondecode(file(local.default_lambda_manifest_file)) : null
+
+  api_lambda_manifest_file = "${var.serverless_next_dir}/api-lambda/manifest.json"
+  api_lambda_manifest      = fileexists(local.api_lambda_manifest_file) ? jsondecode(file(local.api_lambda_manifest_file)) : null
+
+  routes_manifest_file = "${var.next_dir}/routes-manifest.json"
+  routes_manifest      = fileexists(local.routes_manifest_file) ? jsondecode(file(local.routes_manifest_file)) : null
+
+  pages_manifest_file = "${var.next_dir}/serverless/pages-manifest.json"
+  pages_manifest      = fileexists(local.pages_manifest_file) ? jsondecode(file(local.pages_manifest_file)) : null
+
+  prerender_manifest_file = "${var.next_dir}/prerender-manifest.json"
+  prerender_manifest      = fileexists(local.prerender_manifest_file) ? jsondecode(file(local.prerender_manifest_file)) : null
+
+  base_path = local.routes_manifest != null ? (length(local.routes_manifest.basePath) > 0 ? "${substr(local.routes_manifest.basePath, 1, length(local.routes_manifest.basePath))}/" : "") : ""
 
   next_static_paths = {
-    for filename in fileset(module.build.next_dir, "static/**") :
-    "_next/${filename}" => "${module.build.next_dir}/${filename}"
+    for filename in fileset(var.next_dir, "static/**") :
+    "_next/${filename}" => "${var.next_dir}/${filename}"
   }
 
   static_pages_paths = local.pages_manifest != null ? {
     for pageFile in values(local.pages_manifest) :
-    "static-pages/${replace(pageFile, "pages/", "")}" => "${module.build.next_dir}/serverless/${pageFile}"
+    "static-pages/${replace(pageFile, "pages/", "")}" => "${var.next_dir}/serverless/${pageFile}"
     if length(pageFile) > 5 && substr(pageFile, length(pageFile) - 5, 5) == ".html"
   } : null
 
@@ -22,7 +33,7 @@ locals {
     for key in keys(local.prerender_manifest.routes) :
     substr(local.prerender_manifest.routes[key].dataRoute, 1, length(local.prerender_manifest.routes[key].dataRoute) - 1)
     => "${
-      module.build.next_dir}/serverless/pages/${substr(key, length(key) - 1, 1) == "/"
+      var.next_dir}/serverless/pages/${substr(key, length(key) - 1, 1) == "/"
       ? "${trimprefix(key, "/")}index.json"
       : "${trimprefix(key, "/")}.json"
     }"
@@ -35,50 +46,20 @@ locals {
       ? "${trimprefix(key, "/")}index.html"
       : "${trimprefix(key, "/")}.html"
     }"
-    => "${module.build.next_dir}/serverless/pages/${
+    => "${var.next_dir}/serverless/pages/${
       substr(key, length(key) - 1, 1) == "/"
       ? "${trimprefix(key, "/")}index.html"
       : "${trimprefix(key, "/")}.html"
     }"
   } : null
 
-  assets_dir = "${module.build.output_dir}/.serverless_next/assets"
+  assets_dir = "${var.serverless_next_dir}/assets"
 
   public_paths = {
     for filename in fileset(local.assets_dir, "public/**") :
     filename => "${local.assets_dir}/${filename}"
   }
 }
-
-module "s3_objects" {
-  source = "../s3-sync"
-  bucket = module.site.bucket
-  objects = {
-    for path, filename in merge(
-      local.next_static_paths,
-      local.static_pages_paths,
-      local.prerender_pages_json_paths,
-      local.prerender_pages_html_paths,
-      local.public_paths
-    ) :
-    "${local.base_path}${path}" => {
-      source = filename
-      acl    = "public-read"
-    }
-  }
-}
-
-module "build" {
-  source = "./modules/sls-next-build"
-
-  source_dir         = var.source_dir
-  content_dir        = var.content_dir
-  output_dir         = var.build_dir
-  extra_dependencies = var.extra_dependencies
-  npm_config         = var.npm_config
-  env                = var.env
-}
-
 
 module "default_lambda" {
   source = "../lambda"
@@ -87,7 +68,7 @@ module "default_lambda" {
   handler       = "index.handler"
   runtime       = local.runtime
   memory_size   = var.memory_size
-  timeout       = 30
+  timeout       = var.timeout
   edge          = true
   publish       = true
 
@@ -98,8 +79,8 @@ module "default_lambda" {
     }
   }
 
-  filename         = module.build.default_lambda_package_file
-  source_code_hash = fileexists(module.build.default_lambda_package_file) ? filebase64sha256(module.build.default_lambda_package_file) : null
+  filename         = var.default_lambda_package_file
+  source_code_hash = fileexists(var.default_lambda_package_file) ? filebase64sha256(var.default_lambda_package_file) : null
 
   tags = var.tags
 }
@@ -122,12 +103,27 @@ module "api_lambda" {
     }
   }
 
-  filename         = module.build.api_lambda_package_file
-  source_code_hash = fileexists(module.build.api_lambda_package_file) ? filebase64sha256(module.build.api_lambda_package_file) : null
+  filename         = var.api_lambda_package_file
+  source_code_hash = fileexists(var.api_lambda_package_file) ? filebase64sha256(var.api_lambda_package_file) : null
 
   tags = var.tags
 }
 
+resource "aws_s3_bucket_object" "files" {
+  for_each = merge(
+    local.next_static_paths,
+    local.static_pages_paths,
+    local.prerender_pages_json_paths,
+    local.prerender_pages_html_paths,
+    local.public_paths
+  )
+
+  bucket = module.site.bucket
+  key    = each.value
+  source = each.value
+  acl    = "public-read"
+  etag   = filemd5(each.value)
+}
 
 module "site" {
   source      = "../cloudfront-site"

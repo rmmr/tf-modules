@@ -6,7 +6,6 @@ const rootDir = process.cwd()
 const minifyHandlers = process.env.MINIFY_HANDLERS === '1' ? true : false
 const useServerlessTraceTarget = process.env.USE_SERVERLESS_TRACE_TARGETS === '1' ? true : false
 
-
 const builder = new Builder(
   rootDir,
   path.join(rootDir, ".serverless_next"),
