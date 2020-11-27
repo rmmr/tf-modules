@@ -24,7 +24,7 @@ data "archive_file" "default_lambda_package" {
   output_path = "${var.source_dir}/.serverless_next/default-lambda.zip"
 }
 
-data "archive_file" "default_lambda_package" {
+data "archive_file" "api_lambda_package" {
   type        = "zip"
   source_path = "${var.source_dir}/.serverless_next/api-lambda"
   output_path = "${var.source_dir}/.serverless_next/api-lambda.zip"
