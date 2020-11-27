@@ -8,7 +8,7 @@ module "build" {
   cwd        = var.source_dir
   cmd        = <<EOF
   npm install --no-package-lock --no-save @sls-next/lambda-at-edge@1.7.0 klaw@3.0.0 
-  node ${path.root}/${path.module}/data/builder.js
+  node ${abspath(path.root)}/${path.module}/data/builder.js
   EOF
   env = merge(
     {
