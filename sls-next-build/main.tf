@@ -4,7 +4,7 @@ module "build" {
     package_file_has_changed = fileexists("${var.source_dir}/package.json") ? filemd5("${var.source_dir}/package.json") : null
   }
 
-  output_dir = "${var.source_dir}/dist"
+  output_dir = var.source_dir
   cwd        = var.source_dir
   cmd        = <<EOF
   npm install --dev @sls-next/lambda-at-edge@1.7.0 klaw@3.0.0
@@ -20,12 +20,12 @@ module "build" {
 
 data "archive_file" "default_lambda_package" {
   type        = "zip"
-  source_dir  = "${var.source_dir}/.serverless_next/default-lambda"
-  output_path = "${var.source_dir}/.serverless_next/default-lambda.zip"
+  source_dir  = "${module.build.output_dir}/.serverless_next/default-lambda"
+  output_path = "${module.build.output_dir}/.serverless_next/default-lambda.zip"
 }
 
 data "archive_file" "api_lambda_package" {
   type        = "zip"
-  source_dir  = "${var.source_dir}/.serverless_next/api-lambda"
-  output_path = "${var.source_dir}/.serverless_next/api-lambda.zip"
+  source_dir  = "${module.build.output_dir}/.serverless_next/api-lambda"
+  output_path = "${module.build.output_dir}/.serverless_next/api-lambda.zip"
 }
