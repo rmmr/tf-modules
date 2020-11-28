@@ -3,8 +3,12 @@ variable "name" {
   type        = string
 }
 
-variable "values" {
-  type = map(any)
+variable "string" {
+  type    = map(string)
+  default = {}
 }
 
-
+variable "list" {
+  type    = map(list(string))
+  default = {}
+}
