@@ -40,7 +40,12 @@ module "api_gateway" {
   default_stage_access_log_destination_arn = aws_cloudwatch_log_group.api_gateway.arn
   default_stage_access_log_format          = "$context.identity.sourceIp - - [$context.requestTime] \"$context.httpMethod $context.routeKey $context.protocol\" $context.status $context.responseLength $context.requestId $context.integrationErrorMessage"
 
-
+  integrations = {
+    for key, function in var.functions :
+    function.http.path => {
+      lambda_arn = module.lambda[key].this_lambda_function_arn
+    }
+  }
 }
 
 module "lambda" {
@@ -51,6 +56,32 @@ module "lambda" {
   function_name = "${var.name}-${each.key}"
   handler       = each.value.handler
   runtime       = each.value.runtime
+  memory_size   = lookup(each.value, "memory_size", null)
+  timeout       = lookup(each.value, "timeout", null)
+  env           = lookup(each.value, "env", null)
+  publish       = lookup(each.value, "publish", null)
 
+  provisioned_concurrent_executions = lookup(each.value, "provisioned_concurrent_executions", null)
+
+  allowed_actions = lookup(each.value, "allowed_actions", null)
+
+  subnet_ids            = lookup(each.value, "subnet_ids", null)
+  security_group_ids    = lookup(each.value, "security_group_ids", null)
+  attach_network_policy = lookup(each.value, "attach_network_policy", null)
+
+  filename          = lookup(each.value, "package_filename", null)
+  s3_bucket         = lookup(each.value, "package_s3_bucket", null)
+  s3_key            = lookup(each.value, "package_s3_key", null)
+  s3_object_version = lookup(each.value, "package_s3_object_version", null)
+  source_code_hash  = lookup(each.value, "source_code_hash", null)
+
+  allowed_triggers = {
+    AllowExecutionFromAPIGateway = {
+      service    = "apigateway"
+      source_arn = "${module.api_gateway.this_apigatewayv2_api_execution_arn}/*"
+    }
+  }
+
+  tags = lookup(each.value, "tags", null)
 }
 
