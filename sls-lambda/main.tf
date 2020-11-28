@@ -67,7 +67,7 @@ module "lambda" {
 
   subnet_ids            = lookup(each.value, "subnet_ids", null)
   security_group_ids    = lookup(each.value, "security_group_ids", null)
-  attach_network_policy = each.value.attach_network_policy
+  attach_network_policy = try(each.value.attach_network_policy, false)
 
   filename          = lookup(each.value, "package_filename", null)
   s3_bucket         = lookup(each.value, "package_s3_bucket", null)
