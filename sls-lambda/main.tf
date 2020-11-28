@@ -63,7 +63,7 @@ module "lambda" {
 
   provisioned_concurrent_executions = lookup(each.value, "provisioned_concurrent_executions", null)
 
-  allowed_actions = lookup(each.value, "allowed_actions", var.allowed_actions)
+  allowed_actions = lookup(each.value, "allowed_actions", null)
 
   subnet_ids            = lookup(each.value, "subnet_ids", null)
   security_group_ids    = lookup(each.value, "security_group_ids", null)

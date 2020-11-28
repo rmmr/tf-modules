@@ -11,6 +11,11 @@ variable "domain_name" {
 }
 
 variable "functions" {
-  type        = map
-  default     = {}
+  type    = map
+  default = {}
+}
+
+variable "tags" {
+  type    = map(string)
+  default = {}
 }

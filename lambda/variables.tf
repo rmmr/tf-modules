@@ -85,11 +85,6 @@ variable "attach_network_policy" {
   default = false
 }
 
-variable "tags" {
-  type    = map(string)
-  default = {}
-}
-
 variable "allowed_triggers" {
   type    = map(any)
   default = {}
@@ -102,5 +97,10 @@ variable "provisioned_concurrent_executions" {
 
 variable "allowed_actions" {
   type    = map(map(any))
+  default = {}
+}
+
+variable "tags" {
+  type    = map(string)
   default = {}
 }
