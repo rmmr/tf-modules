@@ -18,6 +18,10 @@ resource "aws_route53_record" "api_gateway" {
   }
 }
 
+resource "aws_cloudwatch_log_group" "api_gateway" {
+  name = "/aws/api-gateway/${var.name}"
+}
+
 module "api_gateway" {
   source = "terraform-aws-modules/apigateway-v2/aws"
 
@@ -47,7 +51,7 @@ module "api_gateway" {
 module "lambda" {
   source = "../lambda"
 
-  for_each = var.handlers
+  for_each = var.functions
 
   function_name = "${var.name}-${each.key}"
   handler       = lookup(each.value, "handler")
