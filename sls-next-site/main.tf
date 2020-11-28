@@ -59,6 +59,14 @@ locals {
     for filename in fileset(local.assets_dir, "public/**") :
     filename => "${local.assets_dir}/${filename}"
   }
+
+  files = merge(
+    local.next_static_paths,
+    local.static_pages_paths,
+    local.prerender_pages_json_paths,
+    local.prerender_pages_html_paths,
+    local.public_paths
+  )
 }
 
 module "default_lambda" {
@@ -109,20 +117,21 @@ module "api_lambda" {
   tags = var.tags
 }
 
+
+module "mime" {
+  source = "../mime"
+  files = toset(values(local.files))
+}
+
 resource "aws_s3_bucket_object" "files" {
-  for_each = merge(
-    local.next_static_paths,
-    local.static_pages_paths,
-    local.prerender_pages_json_paths,
-    local.prerender_pages_html_paths,
-    local.public_paths
-  )
+  for_each = local.files
 
   bucket = module.site.bucket
   key    = each.key
   source = each.value
   acl    = "public-read"
   etag   = filemd5(each.value)
+  content_type = module.mime.types[each.value]
 }
 
 module "site" {
