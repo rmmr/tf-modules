@@ -69,11 +69,11 @@ module "lambda" {
   security_group_ids    = lookup(each.value, "security_group_ids", null)
   attach_network_policy = try(each.value.attach_network_policy, false)
 
-  filename          = lookup(each.value, "package_filename", null)
-  s3_bucket         = lookup(each.value, "package_s3_bucket", null)
-  s3_key            = lookup(each.value, "package_s3_key", null)
-  s3_object_version = lookup(each.value, "package_s3_object_version", null)
-  source_code_hash  = lookup(each.value, "source_code_hash", null)
+  filename          = try(each.value.filename, null)
+  s3_bucket         = try(each.value.s3_bucket, null)
+  s3_key            = try(each.value.s3_key, null)
+  s3_object_version = try(each.value.s3_object_version, null)
+  source_code_hash  = try(each.value.source_code_hash, null)
 
   allowed_triggers = {
     AllowExecutionFromAPIGateway = {
