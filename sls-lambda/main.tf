@@ -56,18 +56,18 @@ module "lambda" {
   function_name = "${var.name}-${each.key}"
   handler       = each.value.handler
   runtime       = each.value.runtime
-  memory_size   = lookup(each.value, "memory_size", null)
-  timeout       = lookup(each.value, "timeout", null)
-  env           = lookup(each.value, "env", null)
+  memory_size   = try(each.value.memory_size, null)
+  timeout       = try(each.value.timeout, null)
+  env           = try(each.value.env, null)
   publish       = try(each.value.publish, null)
 
   provisioned_concurrent_executions = try(each.value.provisioned_concurrent_executions, null)
 
-  allowed_actions = lookup(each.value, "allowed_actions", null)
+  allowed_actions = try(each.value.allowed_actions, null)
 
-  subnet_ids            = lookup(each.value, "subnet_ids", null)
-  security_group_ids    = lookup(each.value, "security_group_ids", null)
-  attach_network_policy = try(each.value.attach_network_policy, false)
+  subnet_ids            = try(each.value.subnet_ids, null)
+  security_group_ids    = try(each.value.security_group_ids, null)
+  attach_network_policy = try(each.value.attach_network_policy, null)
 
   filename          = try(each.value.filename, null)
   s3_bucket         = try(each.value.s3_bucket, null)
@@ -82,6 +82,6 @@ module "lambda" {
     }
   }
 
-  tags = lookup(each.value, "tags", null)
+  tags = try(each.value.tags, null)
 }
 
