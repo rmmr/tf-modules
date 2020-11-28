@@ -59,9 +59,9 @@ module "lambda" {
   memory_size   = lookup(each.value, "memory_size", null)
   timeout       = lookup(each.value, "timeout", null)
   env           = lookup(each.value, "env", null)
-  publish       = each.value.publish
+  publish       = try(each.value.publish, null)
 
-  provisioned_concurrent_executions = each.value.provisioned_concurrent_executions
+  provisioned_concurrent_executions = try(each.value.provisioned_concurrent_executions, null)
 
   allowed_actions = lookup(each.value, "allowed_actions", null)
 
