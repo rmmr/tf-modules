@@ -1,7 +1,7 @@
 locals {
   runtime = "nodejs${var.nodejs_version}"
 
-  default_lambda_manifest_file =   "${var.serverless_next_dir}/default-lambda/manifest.json"
+  default_lambda_manifest_file = "${var.serverless_next_dir}/default-lambda/manifest.json"
   default_lambda_manifest      = fileexists(local.default_lambda_manifest_file) ? jsondecode(file(local.default_lambda_manifest_file)) : null
 
   api_lambda_manifest_file = "${var.serverless_next_dir}/api-lambda/manifest.json"
@@ -79,8 +79,8 @@ module "default_lambda" {
     }
   }
 
-  filename         = var.default_lambda_package_file
-  source_code_hash = fileexists(var.default_lambda_package_file) ? filebase64sha256(var.default_lambda_package_file) : null
+  filename         = var.default_lambda_package
+  source_code_hash = fileexists(var.default_lambda_package) ? filebase64sha256(var.default_lambda_package) : null
 
   tags = var.tags
 }
@@ -103,8 +103,8 @@ module "api_lambda" {
     }
   }
 
-  filename         = var.api_lambda_package_file
-  source_code_hash = fileexists(var.api_lambda_package_file) ? filebase64sha256(var.api_lambda_package_file) : null
+  filename         = var.api_lambda_package
+  source_code_hash = fileexists(var.api_lambda_package) ? filebase64sha256(var.api_lambda_package) : null
 
   tags = var.tags
 }

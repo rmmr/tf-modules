@@ -18,11 +18,11 @@ variable "next_dir" {
   type = string
 }
 
-variable "default_lambda_package_file" {
+variable "default_lambda_package" {
   type = string
 }
 
-variable "api_lambda_package_file" {
+variable "api_lambda_package" {
   type = string
 }
 
