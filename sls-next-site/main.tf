@@ -119,7 +119,7 @@ resource "aws_s3_bucket_object" "files" {
   )
 
   bucket = module.site.bucket
-  key    = each.value
+  key    = each.key
   source = each.value
   acl    = "public-read"
   etag   = filemd5(each.value)
