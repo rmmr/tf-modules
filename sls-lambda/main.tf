@@ -40,7 +40,12 @@ module "api_gateway" {
   default_stage_access_log_destination_arn = aws_cloudwatch_log_group.api_gateway.arn
   default_stage_access_log_format          = "$context.identity.sourceIp - - [$context.requestTime] \"$context.httpMethod $context.routeKey $context.protocol\" $context.status $context.responseLength $context.requestId $context.integrationErrorMessage"
 
-
+  integrations = {
+    for key, function in var.functions :
+    function.http.path => {
+      lambda_arn = module.lambda[key].this_lambda_function_arn
+    }
+  }
 }
 
 module "lambda" {
@@ -49,8 +54,8 @@ module "lambda" {
   for_each = var.functions
 
   function_name = "${var.name}-${each.key}"
-  handler       = lookup(each.value, "handler")
-  runtime       = lookup(each.value, "runtime")
+  handler       = each.value.handler
+  runtime       = each.value.runtime
   memory_size   = lookup(each.value, "memory_size", null)
   timeout       = lookup(each.value, "timeout", null)
   env           = lookup(each.value, "env", null)
@@ -77,6 +82,6 @@ module "lambda" {
     }
   }
 
-  tags = lookup(each.value, "tags", var.tags)
+  tags = lookup(each.value, "tags", null)
 }
 
