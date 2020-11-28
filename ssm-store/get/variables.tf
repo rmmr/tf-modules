@@ -4,5 +4,5 @@ variable "name" {
 }
 
 variable "keys" {
-  type = list(string)
+  type = set(string)
 }
