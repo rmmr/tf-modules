@@ -61,7 +61,7 @@ module "lambda" {
   env           = lookup(each.value, "env", null)
   publish       = false
 
-  provisioned_concurrent_executions = 0
+  provisioned_concurrent_executions = -1
 
   allowed_actions = lookup(each.value, "allowed_actions", null)
 
