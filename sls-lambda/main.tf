@@ -59,15 +59,15 @@ module "lambda" {
   memory_size   = lookup(each.value, "memory_size", null)
   timeout       = lookup(each.value, "timeout", null)
   env           = lookup(each.value, "env", null)
-  publish       = lookup(each.value, "publish", null)
+  publish       = false
 
-  provisioned_concurrent_executions = lookup(each.value, "provisioned_concurrent_executions", null)
+  provisioned_concurrent_executions = null
 
   allowed_actions = lookup(each.value, "allowed_actions", null)
 
   subnet_ids            = lookup(each.value, "subnet_ids", null)
   security_group_ids    = lookup(each.value, "security_group_ids", null)
-  attach_network_policy = lookup(each.value, "attach_network_policy", null)
+  attach_network_policy = false
 
   filename          = lookup(each.value, "package_filename", null)
   s3_bucket         = lookup(each.value, "package_s3_bucket", null)
