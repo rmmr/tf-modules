@@ -4,7 +4,7 @@ variable "name" {
 }
 
 variable "values" {
-  type = map
+  type = map(any)
 }
 
 
