@@ -61,7 +61,6 @@ module "lambda" {
   env           = lookup(each.value, "env", null)
   publish       = lookup(each.value, "publish", null)
 
-  provisioned_concurrent_executions = lookup(each.value, "provisioned_concurrent_executions", null)
 
   allowed_actions = lookup(each.value, "allowed_actions", null)
 
@@ -74,13 +73,6 @@ module "lambda" {
   s3_key            = lookup(each.value, "package_s3_key", null)
   s3_object_version = lookup(each.value, "package_s3_object_version", null)
   source_code_hash  = lookup(each.value, "source_code_hash", null)
-
-  allowed_triggers = {
-    AllowExecutionFromAPIGateway = {
-      service    = "apigateway"
-      source_arn = "${module.api_gateway.this_apigatewayv2_api_execution_arn}/*"
-    }
-  }
 
   tags = lookup(each.value, "tags", var.tags)
 }
