@@ -53,7 +53,9 @@ module "api_gateway" {
     merge([
       for event in function.events :
       {
-        (event.route) : module.lambda[key].this_lambda_function_arn
+        (event.route) = {
+          lambda_arn = module.lambda[key].this_lambda_function_arn
+        }
       }
       if event.type == "http"
     ]...)
