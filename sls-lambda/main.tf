@@ -74,7 +74,7 @@ module "lambda" {
   env           = try(each.value.env, null)
   publish       = try(each.value.publish, false)
 
-  provisioned_concurrent_executions = try(each.value.provisioned_concurrent_executions, null)
+  provisioned_concurrent_executions = try(each.value.provisioned_concurrent_executions, -1)
 
   allowed_actions = try(each.value.allowed_actions, {})
 
