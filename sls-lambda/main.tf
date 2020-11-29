@@ -89,7 +89,7 @@ module "lambda" {
   source_code_hash  = try(each.value.source_code_hash, null)
 
   allowed_triggers = {
-    AllowExecutionFromAPIGateway = can(local.api_gateway_functions[key]) ? {
+    AllowExecutionFromAPIGateway = can(local.api_gateway_functions[each.key]) ? {
       service    = "apigateway"
       source_arn = "${module.api_gateway.this_apigatewayv2_api_execution_arn}/*"
     } : null
