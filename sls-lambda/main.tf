@@ -1,3 +1,11 @@
+locals {
+  api_gateway_functions = {
+    for key, function in var.functions :
+    key => function
+    if contains([for event in function.events : event.type], "http")
+  }
+}
+
 module "api_gateway_acm" {
   source  = "terraform-aws-modules/acm/aws"
   version = "~> v2.0"
@@ -40,12 +48,17 @@ module "api_gateway" {
   default_stage_access_log_destination_arn = aws_cloudwatch_log_group.api_gateway.arn
   default_stage_access_log_format          = "$context.identity.sourceIp - - [$context.requestTime] \"$context.httpMethod $context.routeKey $context.protocol\" $context.status $context.responseLength $context.requestId $context.integrationErrorMessage"
 
-  integrations = {
-    for key, function in var.functions :
-    function.http.path => {
-      lambda_arn = module.lambda[key].this_lambda_function_arn
-    }
-  }
+  integrations = merge([
+    for key, function in local.api_gateway_functions :
+    merge([
+      for event in function.events :
+      {
+        (event.route) : module.lambda[key].this_lambda_function_arn
+      }
+      if event.type == "http"
+    ]...)
+    ]...
+  )
 }
 
 module "lambda" {
@@ -76,10 +89,10 @@ module "lambda" {
   source_code_hash  = try(each.value.source_code_hash, null)
 
   allowed_triggers = {
-    AllowExecutionFromAPIGateway = {
+    AllowExecutionFromAPIGateway = can(local.api_gateway_functions[key]) ? {
       service    = "apigateway"
       source_arn = "${module.api_gateway.this_apigatewayv2_api_execution_arn}/*"
-    }
+    } : null
   }
 
   tags = try(each.value.tags, null)
