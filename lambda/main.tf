@@ -11,7 +11,7 @@ resource "aws_cloudwatch_log_group" "lambda" {
   name = "/aws/lambda/${var.function_name}"
 }
 
-data "aws_iam_policy_document" "lambda" {
+data "aws_iam_policy_document" "assume_role" {
   statement {
     effect  = "Allow"
     actions = ["sts:AssumeRole"]
@@ -20,7 +20,9 @@ data "aws_iam_policy_document" "lambda" {
       identifiers = concat(["lambda.amazonaws.com"], var.edge ? ["edgelambda.amazonaws.com"] : [])
     }
   }
+}
 
+data "aws_iam_policy_document" "lambda" {
   statement {
     effect = "Allow"
     actions = [
@@ -43,7 +45,7 @@ data "aws_iam_policy_document" "lambda" {
 
 resource "aws_iam_role" "lambda" {
   name               = "${var.function_name}-role"
-  assume_role_policy = data.aws_iam_policy_document.lambda.json
+  assume_role_policy = data.aws_iam_policy_document.assume_role.json
   tags               = var.tags
 }
 
