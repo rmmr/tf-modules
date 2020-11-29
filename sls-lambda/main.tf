@@ -72,15 +72,15 @@ module "lambda" {
   memory_size   = try(each.value.memory_size, null)
   timeout       = try(each.value.timeout, null)
   env           = try(each.value.env, null)
-  publish       = try(each.value.publish, null)
+  publish       = try(each.value.publish, false)
 
   provisioned_concurrent_executions = try(each.value.provisioned_concurrent_executions, null)
 
-  allowed_actions = try(each.value.allowed_actions, null)
+  allowed_actions = try(each.value.allowed_actions, {})
 
   subnet_ids            = try(each.value.subnet_ids, null)
   security_group_ids    = try(each.value.security_group_ids, null)
-  attach_network_policy = try(each.value.attach_network_policy, null)
+  attach_network_policy = try(each.value.attach_network_policy, false)
 
   filename          = try(each.value.filename, null)
   s3_bucket         = try(each.value.s3_bucket, null)
@@ -88,13 +88,13 @@ module "lambda" {
   s3_object_version = try(each.value.s3_object_version, null)
   source_code_hash  = try(each.value.source_code_hash, null)
 
-  allowed_triggers = {
-    AllowExecutionFromAPIGateway = can(local.api_gateway_functions[each.key]) ? {
+  allowed_triggers = can(local.api_gateway_functions[each.key]) ? {
+    AllowExecutionFromAPIGateway = {
       service    = "apigateway"
       source_arn = "${module.api_gateway.this_apigatewayv2_api_execution_arn}/*"
-    } : null
-  }
+    }
+  } : {}
 
-  tags = try(each.value.tags, null)
+  tags = try(each.value.tags, {})
 }
 
