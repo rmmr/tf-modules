@@ -11,28 +11,26 @@ resource "aws_cloudwatch_log_group" "lambda" {
   name = "/aws/lambda/${var.function_name}"
 }
 
-data "aws_iam_policy_document" "assume_role" {
+data "aws_iam_policy_document" "lambda" {
   statement {
-    effect = "Allow"
-
+    effect  = "Allow"
     actions = ["sts:AssumeRole"]
-
     principals {
       type        = "Service"
       identifiers = concat(["lambda.amazonaws.com"], var.edge ? ["edgelambda.amazonaws.com"] : [])
     }
   }
-}
 
-resource "aws_iam_role" "lambda" {
-  name = "${var.function_name}-role"
+  statement {
+    effect = "Allow"
+    actions = [
+      "logs:CreateLogStream",
+      "logs:PutLogEvents",
+    ]
 
-  assume_role_policy = data.aws_iam_policy_document.assume_role.json
+    resources = flatten([for _, v in ["%v:*", "%v:*:*"] : format(v, local.log_group_arn)])
+  }
 
-  tags = var.tags
-}
-
-data "aws_iam_policy_document" "lambda" {
   dynamic "statement" {
     for_each = var.allowed_actions
     content {
@@ -41,6 +39,12 @@ data "aws_iam_policy_document" "lambda" {
       resources = lookup(statement.value, "resources", null)
     }
   }
+}
+
+resource "aws_iam_role" "lambda" {
+  name               = "${var.function_name}-role"
+  assume_role_policy = data.aws_iam_policy_document.lambda.json
+  tags               = var.tags
 }
 
 resource "aws_iam_policy" "lambda" {
@@ -52,30 +56,6 @@ resource "aws_iam_policy_attachment" "lambda" {
   name       = var.function_name
   roles      = [aws_iam_role.lambda.name]
   policy_arn = aws_iam_policy.lambda.arn
-}
-
-data "aws_iam_policy_document" "logs" {
-  statement {
-
-    effect = "Allow"
-    actions = [
-      "logs:CreateLogStream",
-      "logs:PutLogEvents",
-    ]
-
-    resources = flatten([for _, v in ["%v:*", "%v:*:*"] : format(v, local.log_group_arn)])
-  }
-}
-
-resource "aws_iam_policy" "logs" {
-  name   = "${var.function_name}-logs"
-  policy = data.aws_iam_policy_document.logs.json
-}
-
-resource "aws_iam_policy_attachment" "logs" {
-  name       = "${var.function_name}-logs"
-  roles      = [aws_iam_role.lambda.name]
-  policy_arn = aws_iam_policy.logs.arn
 }
 
 data "aws_iam_policy" "vpc" {
