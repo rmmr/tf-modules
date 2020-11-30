@@ -8,7 +8,7 @@ variable "availability_zones" {
 }
 
 variable "security_group_ids" {
-  type = list(string)
+  type    = list(string)
   default = null
 }
 
@@ -37,7 +37,17 @@ variable "enable_internet_gateway" {
   default = false
 }
 
+variable "enable_dns_support" {
+  type    = bool
+  default = true
+}
+
 variable "enable_dns_hostnames" {
+  type    = bool
+  default = false
+}
+
+variable "private_dns_enabled" {
   type    = bool
   default = false
 }
