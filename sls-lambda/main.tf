@@ -90,7 +90,7 @@ module "lambda" {
   s3_object_version = try(each.value.s3_object_version, null)
   source_code_hash  = try(each.value.source_code_hash, null)
 
-  allowed_triggers = can(local.api_gateway_functions[each.key]) ? {
+  allowed_triggers = contains([for event in each.value.events : event.type], "http") ? {
     AllowExecutionFromAPIGateway = {
       service    = "apigateway"
       source_arn = "${module.api_gateway.this_apigatewayv2_api_execution_arn}/*"
