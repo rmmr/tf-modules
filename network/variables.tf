@@ -22,6 +22,11 @@ variable "enable_dynamodb_endpoint" {
   default = false
 }
 
+variable "enable_sqs_endpoint" {
+  type    = bool
+  default = false
+}
+
 variable "enable_internet_gateway" {
   type    = bool
   default = false

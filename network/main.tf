@@ -63,6 +63,13 @@ resource "aws_vpc_endpoint" "dynamodb" {
   tags         = var.tags
 }
 
+resource "aws_vpc_endpoint" "sqs" {
+  count        = var.enable_sqs_endpoint ? 1 : 0
+  vpc_id       = aws_vpc._.id
+  service_name = "com.amazonaws.${var.aws_region}.sqs"
+  tags         = var.tags
+}
+
 resource "aws_vpc_endpoint_route_table_association" "s3" {
   count           = var.enable_s3_endpoint ? 1 : 0
   route_table_id  = aws_route_table.private.id
@@ -73,4 +80,10 @@ resource "aws_vpc_endpoint_route_table_association" "dynamodb" {
   count           = var.enable_dynamodb_endpoint ? 1 : 0
   route_table_id  = aws_route_table.private.id
   vpc_endpoint_id = aws_vpc_endpoint.dynamodb[count.index].id
+}
+
+resource "aws_vpc_endpoint_route_table_association" "sqs" {
+  count           = var.enable_sqs_endpoint ? 1 : 0
+  route_table_id  = aws_route_table.private.id
+  vpc_endpoint_id = aws_vpc_endpoint.sqs[count.index].id
 }
