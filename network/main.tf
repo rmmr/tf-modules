@@ -83,9 +83,3 @@ resource "aws_vpc_endpoint_route_table_association" "dynamodb" {
   route_table_id  = aws_route_table.private.id
   vpc_endpoint_id = aws_vpc_endpoint.dynamodb[count.index].id
 }
-
-resource "aws_vpc_endpoint_route_table_association" "sqs" {
-  count           = var.enable_sqs_endpoint ? 1 : 0
-  route_table_id  = aws_route_table.private.id
-  vpc_endpoint_id = aws_vpc_endpoint.sqs[count.index].id
-}
