@@ -66,6 +66,7 @@ resource "aws_vpc_endpoint" "dynamodb" {
 resource "aws_vpc_endpoint" "sqs" {
   count        = var.enable_sqs_endpoint ? 1 : 0
   vpc_id       = aws_vpc._.id
+  vpc_endpoint_type = "Interface"
   service_name = "com.amazonaws.${var.aws_region}.sqs"
   tags         = var.tags
 }
