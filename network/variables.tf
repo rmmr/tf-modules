@@ -7,6 +7,11 @@ variable "availability_zones" {
   default = null
 }
 
+variable "security_group_ids" {
+  type = list(string)
+  default = null
+}
+
 variable "cidr_block" {
   type    = string
   default = "20.0.0.0/16"

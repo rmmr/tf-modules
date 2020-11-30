@@ -68,6 +68,7 @@ resource "aws_vpc_endpoint" "sqs" {
   vpc_id       = aws_vpc._.id
   vpc_endpoint_type = "Interface"
   service_name = "com.amazonaws.${var.aws_region}.sqs"
+  security_group_ids = var.security_group_ids
   tags         = var.tags
 }
 
