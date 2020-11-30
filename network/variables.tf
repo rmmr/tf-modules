@@ -47,11 +47,6 @@ variable "enable_dns_hostnames" {
   default = false
 }
 
-variable "private_dns_enabled" {
-  type    = bool
-  default = false
-}
-
 variable "create_public_subnet" {
   type    = bool
   default = false

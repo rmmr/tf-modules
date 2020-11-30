@@ -71,7 +71,7 @@ resource "aws_vpc_endpoint" "sqs" {
   service_name        = "com.amazonaws.${var.aws_region}.sqs"
   security_group_ids  = var.security_group_ids
   subnet_ids          = aws_subnet.private.*.id
-  private_dns_enabled = var.private_dns_enabled
+  private_dns_enabled = var.enable_dns_hostnames
   tags                = var.tags
 }
 
