@@ -5,6 +5,7 @@ const rootDir = process.cwd()
 
 const minifyHandlers = process.env.MINIFY_HANDLERS === '1' ? true : false
 const useServerlessTraceTarget = process.env.USE_SERVERLESS_TRACE_TARGETS === '1' ? true : false
+const domainRedirects = process.env.DOMAIN_REDIRECTS !== undefined ? JSON.parse(process.env.DOMAIN_REDIRECTS) : {}
 
 const builder = new Builder(
   rootDir,
@@ -16,6 +17,7 @@ const builder = new Builder(
     args: ['build'],
     minifyHandlers,
     useServerlessTraceTarget,
+    domainRedirects,
   }
 );
 

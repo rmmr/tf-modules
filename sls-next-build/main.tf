@@ -16,7 +16,8 @@ module "build" {
   env = merge(
     {
       MINIFY_HANDLERS : var.minify_handlers ? 1 : 0,
-      USE_SERVERLESS_TRACE_TARGETS : var.use_serverless_trace_targets ? 1 : 0
+      USE_SERVERLESS_TRACE_TARGETS : var.use_serverless_trace_targets ? 1 : 0,
+      DOMAIN_REDIRECTS : jsonencode(var.domain_redirects)
     },
   var.env)
 }

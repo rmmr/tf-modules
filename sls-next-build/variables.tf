@@ -12,6 +12,11 @@ variable "env" {
   default = {}
 }
 
+variable "domain_redirects" {
+  type    = map(string)
+  default = {}
+}
+
 variable "minify_handlers" {
   type    = bool
   default = true
