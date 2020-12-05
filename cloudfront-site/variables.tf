@@ -6,6 +6,11 @@ variable "domain_name" {
   type = string
 }
 
+variable "aliases" {
+  type    = list(string)
+  default = []
+}
+
 variable "bucket_name" {
   type    = string
   default = null

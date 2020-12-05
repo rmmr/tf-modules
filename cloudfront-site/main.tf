@@ -39,7 +39,7 @@ resource "aws_cloudfront_distribution" "_" {
   }
 
   enabled     = var.enabled
-  aliases     = [var.domain_name]
+  aliases     = concat([var.domain_name], var.aliases)
   price_class = var.price_class
 
   default_root_object = var.index_document
@@ -171,3 +171,4 @@ resource "aws_route53_record" "_" {
     evaluate_target_health = false
   }
 }
+
