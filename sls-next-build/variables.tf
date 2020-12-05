@@ -3,7 +3,7 @@ variable "source_dir" {
 }
 
 variable "triggers" {
-  type    = map()
+  type    = map(any)
   default = {}
 }
 
