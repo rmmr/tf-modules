@@ -2,6 +2,11 @@ variable "source_dir" {
   type = string
 }
 
+variable "triggers" {
+  type    = map()
+  default = {}
+}
+
 variable "env" {
   type    = map(string)
   default = {}
