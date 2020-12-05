@@ -1,8 +1,11 @@
 module "build" {
   source = "../build"
-  triggers = merge({
-    package_file_has_changed = fileexists("${var.source_dir}/package.json") ? filemd5("${var.source_dir}/package.json") : null
-  }, var.triggers)
+  triggers = merge(
+    {
+      package_file_has_changed = fileexists("${var.source_dir}/package.json") ? filemd5("${var.source_dir}/package.json") : null
+    },
+    var.triggers
+  )
 
   output_dir = var.source_dir
   cwd        = var.source_dir
