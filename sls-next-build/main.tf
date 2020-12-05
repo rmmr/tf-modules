@@ -10,6 +10,7 @@ module "build" {
   output_dir = var.source_dir
   cwd        = var.source_dir
   cmd        = <<EOF
+  set -e
   npm install --no-package-lock --no-save @sls-next/lambda-at-edge@1.7.0 klaw@3.0.0 
   NODE_PATH="./node_modules" node ${abspath(path.root)}/${path.module}/data/builder.js
   EOF
