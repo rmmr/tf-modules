@@ -16,7 +16,7 @@ variable "triggers" {
   default = null
 }
 
-variable env {
+variable "env" {
   type    = map(any)
   default = null
 }
