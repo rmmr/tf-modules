@@ -14,7 +14,7 @@ async function main() {
     rootDir,
     path.join(rootDir, ".serverless_next"),
     {
-      cmd: './node_modules/.bin/next',
+      cmd: path.join(rootDir, 'node_modules/.bin/next'),
       cwd: rootDir,
       env: {},
       args: ['build'],
@@ -27,6 +27,7 @@ async function main() {
   await builder.build()
 }
 
-main().catch(() => {
+main().catch((error) => {
+  console.error(error)
   process.exit(1)
 })
