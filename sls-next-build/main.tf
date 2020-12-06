@@ -11,7 +11,7 @@ module "build" {
   cwd        = var.source_dir
   cmd        = <<EOF
   set -e
-  NODE_PATH="./node_modules" node ${abspath(path.root)}/${path.module}/data/builder.js
+  node ${abspath(path.root)}/${path.module}/data/builder.js
   EOF
   env = merge(
     {
