@@ -11,6 +11,7 @@ module "build" {
   cwd        = var.source_dir
   cmd        = <<EOF
   set -e
+  echo $PWD
   ./node_modules/.bin/next -v
   node ${abspath(path.root)}/${path.module}/data/builder.js
   EOF
