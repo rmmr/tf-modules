@@ -8,7 +8,7 @@ locals {
   sqs_events = merge([
     for key, function in var.functions :
     merge([
-      for event in functions.events :
+      for event in function.events :
       {
         (event.queue_arn) = key
       }
