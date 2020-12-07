@@ -4,6 +4,16 @@ locals {
     key => function
     if contains([for event in function.events : event.type], "http")
   }
+
+  sqs_events = {
+    for key, function in var.functions :
+    key => function
+    merge([
+      for event in functions.events :
+      (event.queue_arn) => key
+      if event.type == "sqs"
+    ]...)
+  }
 }
 
 module "api_gateway_acm" {
@@ -68,6 +78,14 @@ module "api_gateway" {
     ]...)
     ]...
   )
+}
+
+resource "aws_lambda_event_source_mapping" "sqs" {
+
+  for_each = local.sqs_events
+
+  event_source_arn = each.key
+  function_name    = module.lambda[each.value].this_lambda_function_arn
 }
 
 module "lambda" {
