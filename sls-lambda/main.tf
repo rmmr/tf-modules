@@ -7,6 +7,8 @@ locals {
 }
 
 module "api_gateway_acm" {
+  count = var.domain_name != null ? 1 : 0
+
   source  = "terraform-aws-modules/acm/aws"
   version = "~> v2.0"
 
@@ -15,22 +17,27 @@ module "api_gateway_acm" {
 }
 
 resource "aws_route53_record" "api_gateway" {
+  count = var.domain_name != null ? 1 : 0
+
   name    = var.domain_name
   type    = "A"
   zone_id = var.zone_id
 
   alias {
-    name                   = module.api_gateway.this_apigatewayv2_domain_name_configuration[0].target_domain_name
-    zone_id                = module.api_gateway.this_apigatewayv2_domain_name_configuration[0].hosted_zone_id
+    name                   = module.api_gateway[0].this_apigatewayv2_domain_name_configuration[0].target_domain_name
+    zone_id                = module.api_gateway[0].this_apigatewayv2_domain_name_configuration[0].hosted_zone_id
     evaluate_target_health = false
   }
 }
 
 resource "aws_cloudwatch_log_group" "api_gateway" {
-  name = "/aws/api-gateway/${var.name}"
+  count = var.domain_name != null ? 1 : 0
+  name  = "/aws/api-gateway/${var.name}"
 }
 
 module "api_gateway" {
+  count = var.domain_name != null ? 1 : 0
+
   source = "terraform-aws-modules/apigateway-v2/aws"
 
   name          = var.name
@@ -43,9 +50,9 @@ module "api_gateway" {
   }
 
   domain_name                 = var.domain_name
-  domain_name_certificate_arn = module.api_gateway_acm.this_acm_certificate_arn
+  domain_name_certificate_arn = module.api_gateway_acm[0].this_acm_certificate_arn
 
-  default_stage_access_log_destination_arn = aws_cloudwatch_log_group.api_gateway.arn
+  default_stage_access_log_destination_arn = aws_cloudwatch_log_group[0].api_gateway.arn
   default_stage_access_log_format          = "$context.identity.sourceIp - - [$context.requestTime] \"$context.httpMethod $context.routeKey $context.protocol\" $context.status $context.responseLength $context.requestId $context.integrationErrorMessage"
 
   integrations = merge([
@@ -93,7 +100,7 @@ module "lambda" {
   allowed_triggers = contains([for event in each.value.events : event.type], "http") ? {
     AllowExecutionFromAPIGateway = {
       service    = "apigateway"
-      source_arn = "${module.api_gateway.this_apigatewayv2_api_execution_arn}/*"
+      source_arn = "${module.api_gateway[0].this_apigatewayv2_api_execution_arn}/*"
     }
   } : {}
 

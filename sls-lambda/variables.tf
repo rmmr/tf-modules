@@ -3,11 +3,13 @@ variable "name" {
 }
 
 variable "zone_id" {
-  type = string
+  type    = string
+  default = null
 }
 
 variable "domain_name" {
-  type = string
+  type    = string
+  default = null
 }
 
 variable "functions" {
