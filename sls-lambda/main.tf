@@ -5,15 +5,16 @@ locals {
     if contains([for event in function.events : event.type], "http")
   }
 
-  sqs_events = {
+  sqs_events = merge([
     for key, function in var.functions :
-    key => function
     merge([
       for event in functions.events :
-      (event.queue_arn) => key
+      {
+        (event.queue_arn) = key
+      }
       if event.type == "sqs"
     ]...)
-  }
+  ]...)
 }
 
 module "api_gateway_acm" {
