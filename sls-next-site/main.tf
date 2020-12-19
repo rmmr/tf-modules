@@ -33,7 +33,7 @@ locals {
 
   prerender_pages_json_paths = local.prerender_manifest != null ? {
     for key in keys(local.prerender_manifest.routes) :
-    "${local.build_id}/${substr(local.prerender_manifest.routes[key].dataRoute, 1, length(local.prerender_manifest.routes[key].dataRoute) - 1)}"
+    substr(local.prerender_manifest.routes[key].dataRoute, 1, length(local.prerender_manifest.routes[key].dataRoute) - 1)
     => "${
       var.next_dir}/serverless/pages/${substr(key, length(key) - 1, 1) == "/"
       ? "${trimprefix(key, "/")}index.json"
