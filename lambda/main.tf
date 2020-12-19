@@ -8,7 +8,8 @@ data "aws_arn" "log_group_arn" {
 }
 
 resource "aws_cloudwatch_log_group" "lambda" {
-  name = "/aws/lambda/${var.function_name}"
+  name              = "/aws/lambda/${var.function_name}"
+  retention_in_days = 1
 }
 
 data "aws_iam_policy_document" "assume_role" {
