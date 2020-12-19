@@ -2,7 +2,7 @@ locals {
   runtime = "nodejs${var.nodejs_version}"
 
   manifest_file = "${var.serverless_next_dir}/manifest.json"
-  manifest      = fileexists(local.api_lambda_manifest_file) ? jsondecode(file(local.api_lambda_manifest_file)) : null
+  manifest      = fileexists(local.manifest_file) ? jsondecode(file(local.manifest_file)) : null
 
   default_lambda_manifest_file = "${var.serverless_next_dir}/default-lambda/manifest.json"
   default_lambda_manifest      = fileexists(local.default_lambda_manifest_file) ? jsondecode(file(local.default_lambda_manifest_file)) : null
