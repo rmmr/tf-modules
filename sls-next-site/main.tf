@@ -1,6 +1,9 @@
 locals {
   runtime = "nodejs${var.nodejs_version}"
 
+  manifest_file = "${var.serverless_next_dir}/manifest.json"
+  manifest      = fileexists(local.api_lambda_manifest_file) ? jsondecode(file(local.api_lambda_manifest_file)) : null
+
   default_lambda_manifest_file = "${var.serverless_next_dir}/default-lambda/manifest.json"
   default_lambda_manifest      = fileexists(local.default_lambda_manifest_file) ? jsondecode(file(local.default_lambda_manifest_file)) : null
 
@@ -18,14 +21,16 @@ locals {
 
   base_path = local.routes_manifest != null ? (length(local.routes_manifest.basePath) > 0 ? "${substr(local.routes_manifest.basePath, 1, length(local.routes_manifest.basePath))}/" : "") : ""
 
+  build_id = local.manifest !== null ? local.manifest.buildId : null
+
   next_static_paths = {
     for filename in fileset(var.next_dir, "static/**") :
-    "_next/${filename}" => "${var.next_dir}/${filename}"
+    "_next/${local.build_id}/${filename}" => "${var.next_dir}/${filename}"
   }
 
   static_pages_paths = local.pages_manifest != null ? {
     for pageFile in values(local.pages_manifest) :
-    "static-pages/${replace(pageFile, "pages/", "")}" => "${var.next_dir}/serverless/${pageFile}"
+    "static-pages/${local.build_id}/${replace(pageFile, "pages/", "")}" => "${var.next_dir}/serverless/${pageFile}"
     if length(pageFile) > 5 && substr(pageFile, length(pageFile) - 5, 5) == ".html"
   } : null
 
@@ -120,17 +125,17 @@ module "api_lambda" {
 
 module "mime" {
   source = "../mime"
-  files = toset(values(local.files))
+  files  = toset(values(local.files))
 }
 
 resource "aws_s3_bucket_object" "files" {
   for_each = local.files
 
-  bucket = module.site.bucket
-  key    = each.key
-  source = each.value
-  acl    = "public-read"
-  etag   = filemd5(each.value)
+  bucket       = module.site.bucket
+  key          = each.key
+  source       = each.value
+  acl          = "public-read"
+  etag         = filemd5(each.value)
   content_type = module.mime.types[each.value]
 }
 
