@@ -1,9 +1,6 @@
 locals {
   runtime = "nodejs${var.nodejs_version}"
 
-  manifest_file = "${var.serverless_next_dir}/manifest.json"
-  manifest      = fileexists(local.manifest_file) ? jsondecode(file(local.manifest_file)) : null
-
   default_lambda_manifest_file = "${var.serverless_next_dir}/default-lambda/manifest.json"
   default_lambda_manifest      = fileexists(local.default_lambda_manifest_file) ? jsondecode(file(local.default_lambda_manifest_file)) : null
 
@@ -21,7 +18,7 @@ locals {
 
   base_path = local.routes_manifest != null ? (length(local.routes_manifest.basePath) > 0 ? "${substr(local.routes_manifest.basePath, 1, length(local.routes_manifest.basePath))}/" : "") : ""
 
-  build_id = local.manifest != null ? local.manifest.buildId : null
+  build_id = local.default_lambda_manifest != null ? local.default_lambda_manifest.buildId : null
 
   next_static_paths = {
     for filename in fileset(var.next_dir, "static/**") :
