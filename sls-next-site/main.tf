@@ -21,7 +21,7 @@ locals {
 
   base_path = local.routes_manifest != null ? (length(local.routes_manifest.basePath) > 0 ? "${substr(local.routes_manifest.basePath, 1, length(local.routes_manifest.basePath))}/" : "") : ""
 
-  build_id = local.manifest !== null ? local.manifest.buildId : null
+  build_id = local.manifest != null ? local.manifest.buildId : null
 
   next_static_paths = {
     for filename in fileset(var.next_dir, "static/**") :
