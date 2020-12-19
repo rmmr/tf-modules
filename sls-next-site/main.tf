@@ -22,7 +22,7 @@ locals {
 
   next_static_paths = {
     for filename in fileset(var.next_dir, "static/**") :
-    "_next/${local.build_id}/${filename}" => "${var.next_dir}/${filename}"
+    "_next/${filename}" => "${var.next_dir}/${filename}"
   }
 
   static_pages_paths = local.pages_manifest != null ? {
