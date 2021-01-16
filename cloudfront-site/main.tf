@@ -16,6 +16,19 @@ module "acm" {
   tags = var.tags
 }
 
+module "alias_acm" {
+
+  for_each = var.aliases
+
+  source  = "terraform-aws-modules/acm/aws"
+  version = "~> v2.0"
+
+  domain_name = each.value
+  zone_id     = var.zone_id
+
+  tags = var.tags
+}
+
 resource "aws_s3_bucket" "_" {
   bucket = var.bucket_name != null ? var.bucket_name : replace(var.domain_name, ".", "-")
   acl    = "public-read"
@@ -172,3 +185,16 @@ resource "aws_route53_record" "_" {
   }
 }
 
+resource "aws_route53_record" "alias" {
+  for_each = var.aliases
+
+  zone_id = var.zone_id
+  name    = each.value
+  type    = "A"
+
+  alias {
+    name                   = aws_cloudfront_distribution._.domain_name
+    zone_id                = aws_cloudfront_distribution._.hosted_zone_id
+    evaluate_target_health = false
+  }
+}

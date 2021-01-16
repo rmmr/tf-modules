@@ -141,6 +141,7 @@ module "site" {
   zone_id     = var.zone_id
   domain_name = var.domain_name
   bucket_name = var.bucket_name
+  aliases     = var.aliases
 
   cache_behavior = {
     default = {

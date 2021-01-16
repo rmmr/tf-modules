@@ -7,7 +7,7 @@ variable "domain_name" {
 }
 
 variable "aliases" {
-  type    = list(string)
+  type    = set(string)
   default = []
 }
 

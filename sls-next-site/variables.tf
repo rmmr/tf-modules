@@ -10,6 +10,11 @@ variable "domain_name" {
   type = string
 }
 
+variable "aliases" {
+  type    = set(string)
+  default = []
+}
+
 variable "serverless_next_dir" {
   type = string
 }
