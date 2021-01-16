@@ -5,7 +5,7 @@ locals {
     if contains([for event in function.events : event.type], "http")
   }
 
-  sqs_events = merge([
+  sqs_events = merge({}, [
     for key, function in var.functions :
     merge([
       for event in function.events :
