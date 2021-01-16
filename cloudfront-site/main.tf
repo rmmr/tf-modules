@@ -13,18 +13,7 @@ module "acm" {
   domain_name = var.domain_name
   zone_id     = var.zone_id
 
-  tags = var.tags
-}
-
-module "alias_acm" {
-
-  for_each = var.aliases
-
-  source  = "terraform-aws-modules/acm/aws"
-  version = "~> v2.0"
-
-  domain_name = each.value
-  zone_id     = var.zone_id
+  subject_alternative_names = tolist(var.aliases)
 
   tags = var.tags
 }
