@@ -12,8 +12,9 @@ NODE_PATH="./node_modules" node ${abspath(path.root)}/${path.module}/data/builde
 EOF
   docker_build_cmd = <<EOF
 docker run \
+   --rm \
   ${join(" ", [for k, v in local.env : "-e ${k}=${v}"])}\
-  -v ${var.source_dir}:/var/task \
+  -v ${abspath(var.source_dir)}:/var/task \
   -v ${abspath(path.root)}/${path.module}/data/builder.js:/tmp/builder.js \
   "lambci/lambda:build-nodejs12.x" \
   /bin/bash -c "
