@@ -6,7 +6,21 @@ locals {
       DOMAIN_REDIRECTS : jsonencode(var.domain_redirects)
     },
   var.env)
-  local_build_cmd  = <<EOF
+}
+
+
+module "build" {
+  source = "../build"
+  triggers = merge(
+    {
+      package_file_has_changed = fileexists("${var.source_dir}/package.json") ? filemd5("${var.source_dir}/package.json") : null
+    },
+    var.triggers
+  )
+
+  output_dir       = var.source_dir
+  cwd              = var.source_dir
+  cmd              = <<EOF
 set -e;
 NODE_PATH="./node_modules" node ${abspath(path.root)}/${path.module}/data/builder.js;
 EOF
@@ -20,22 +34,7 @@ docker run \
     set -e; \
     NODE_PATH="./node_modules" node /tmp/builder.js;"
 EOF
-}
-
-
-module "build" {
-  source = "../build"
-  triggers = merge(
-    {
-      package_file_has_changed = fileexists("${var.source_dir}/package.json") ? filemd5("${var.source_dir}/package.json") : null
-    },
-    var.triggers
-  )
-
-  output_dir = var.source_dir
-  cwd        = var.source_dir
-  cmd        = var.use_docker ? local.docker_build_cmd : local.local_build_cmd
-  env        = local.env
+  env              = local.env
 }
 
 data "archive_file" "default_lambda_package" {

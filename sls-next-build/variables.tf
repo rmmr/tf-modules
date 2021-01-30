@@ -27,7 +27,3 @@ variable "use_serverless_trace_targets" {
   default = false
 }
 
-variable "use_docker" {
-  type    = bool
-  default = false
-}
