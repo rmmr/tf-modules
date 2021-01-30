@@ -34,7 +34,7 @@ module "build" {
 
   output_dir = var.source_dir
   cwd        = var.source_dir
-  cmd        = var.use_docker ? local.local_build_cmd : local.docker_build_cmd
+  cmd        = var.use_docker ? local.docker_build_cmd : local.local_build_cmd
   env        = local.env
 }
 
