@@ -7,7 +7,7 @@ output "this_lambda_function_qualified_arn" {
 }
 
 output "this_lambda_function_name" {
-  value = aws_lambda_function.this.name
+  value = aws_lambda_function.this.function_name
 }
 
 output "this_aws_iam_role_name" {
