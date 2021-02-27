@@ -100,7 +100,7 @@ resource "aws_lambda_event_source_mapping" "sqs" {
   for_each = local.sqs_events
 
   event_source_arn = each.key
-  function_name    = module.lambda[each.value.function].this_lambda_function_arn
+  function_name    = module.lambda[each.value].this_lambda_function_arn
 }
 
 resource "aws_cloudwatch_event_rule" "rule" {
@@ -113,7 +113,7 @@ resource "aws_cloudwatch_event_target" "target" {
   for_each = local.schedule_events
 
   rule = each.key
-  arn  = module.lambda[each.value].this_lambda_function_arn
+  arn  = module.lambda[each.value.function].this_lambda_function_arn
 }
 
 module "lambda" {
