@@ -15,6 +15,20 @@ locals {
       if event.type == "sqs"
     ]...)
   ]...)
+
+  schedule_events = merge({}, [
+    for key, function in var.functions :
+    merge([
+      for event in function.events :
+      {
+        ("${key}-${event.name}") = {
+          function   = function
+          expression = event.expression
+        }
+      }
+      if event.type == "schedule"
+    ]...)
+  ]...)
 }
 
 module "api_gateway_acm" {
@@ -87,6 +101,19 @@ resource "aws_lambda_event_source_mapping" "sqs" {
 
   event_source_arn = each.key
   function_name    = module.lambda[each.value].this_lambda_function_arn
+}
+
+resource "aws_cloudwatch_event_rule" "rule" {
+  for_each = local.schedule_events
+
+  name                = each.key
+  schedule_expression = each.value.expression
+}
+resource "aws_cloudwatch_event_target" "target" {
+  for_each = local.schedule_events
+
+  rule = each.key
+  arn  = module.lambda[each.value].this_lambda_function_arn
 }
 
 module "lambda" {
