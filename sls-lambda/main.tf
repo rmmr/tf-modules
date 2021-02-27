@@ -22,7 +22,7 @@ locals {
       for event in function.events :
       {
         ("${key}-${event.name}") = {
-          function   = function
+          function   = key
           expression = event.expression
         }
       }
@@ -113,7 +113,7 @@ resource "aws_cloudwatch_event_target" "target" {
   for_each = local.schedule_events
 
   rule = each.key
-  arn  = module.lambda[each.value.function].this_lambda_function_arn
+  arn  = module.lambda[each.value].this_lambda_function_arn
 }
 
 module "lambda" {
