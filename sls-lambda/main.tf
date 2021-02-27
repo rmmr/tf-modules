@@ -109,11 +109,22 @@ resource "aws_cloudwatch_event_rule" "rule" {
   name                = each.key
   schedule_expression = each.value.expression
 }
+
 resource "aws_cloudwatch_event_target" "target" {
   for_each = local.schedule_events
 
-  rule = each.key
+  rule = aws_cloudwatch_event_rule.rule[each.key].name
   arn  = module.lambda[each.value.function].this_lambda_function_arn
+}
+
+resource "aws_lambda_permission" "allow_cloudwatch" {
+  for_each = local.schedule_events
+
+  statement_id  = "AllowExecutionFromCloudWatch"
+  action        = "lambda:InvokeFunction"
+  function_name = module.lambda[each.value.function].this_lambda_function_name
+  principal     = "events.amazonaws.com"
+  source_arn    = aws_cloudwatch_event_rule.rule[each.key].arn
 }
 
 module "lambda" {
