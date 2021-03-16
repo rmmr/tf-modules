@@ -281,7 +281,7 @@ module "site" {
     }
 
     next_image = {
-      path_pattern = "${local.base_path}_next/image/*"
+      path_pattern = "${local.base_path}_next/image*"
 
       min_ttl     = 0
       default_ttl = 60
