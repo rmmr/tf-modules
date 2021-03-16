@@ -37,3 +37,10 @@ data "archive_file" "api_lambda_package" {
   source_dir  = "${module.build.output_dir}/.serverless_next/api-lambda"
   output_path = "${module.build.output_dir}/.serverless_next/api-lambda.zip"
 }
+
+data "archive_file" "image_lambda_package" {
+  depends_on  = [module.build]
+  type        = "zip"
+  source_dir  = "${module.build.output_dir}/.serverless_next/image-lambda"
+  output_path = "${module.build.output_dir}/.serverless_next/image-lambda.zip"
+}

@@ -31,6 +31,10 @@ variable "api_lambda_package" {
   type = string
 }
 
+variable "image_lambda_package" {
+  type = string
+}
+
 variable "bucket_name" {
   type    = string
   default = null

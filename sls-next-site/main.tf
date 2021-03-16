@@ -7,6 +7,9 @@ locals {
   api_lambda_manifest_file = "${var.serverless_next_dir}/api-lambda/manifest.json"
   api_lambda_manifest      = fileexists(local.api_lambda_manifest_file) ? jsondecode(file(local.api_lambda_manifest_file)) : null
 
+  image_lambda_manifest_file = "${var.serverless_next_dir}/image-lambda/manifest.json"
+  image_lambda_manifest      = fileexists(local.image_lambda_manifest_file) ? jsondecode(file(local.image_lambda_manifest_file)) : null
+
   routes_manifest_file = "${var.next_dir}/routes-manifest.json"
   routes_manifest      = fileexists(local.routes_manifest_file) ? jsondecode(file(local.routes_manifest_file)) : null
 
@@ -115,6 +118,31 @@ module "api_lambda" {
 
   filename         = var.api_lambda_package
   source_code_hash = fileexists(var.api_lambda_package) ? filebase64sha256(var.api_lambda_package) : null
+
+  tags = var.tags
+}
+
+
+module "image_lambda" {
+  source = "../lambda"
+
+  function_name = "${var.name}-image"
+  handler       = "index.handler"
+  runtime       = local.runtime
+  memory_size   = var.memory_size
+  timeout       = var.timeout
+  edge          = true
+  publish       = true
+
+  allowed_actions = {
+    AllowS3Access = {
+      actions   = ["*"]
+      resources = ["*"]
+    }
+  }
+
+  filename         = var.image_lambda_package
+  source_code_hash = fileexists(var.image_lambda_package) ? filebase64sha256(var.image_lambda_package) : null
 
   tags = var.tags
 }
@@ -250,6 +278,29 @@ module "site" {
           lambda_arn = module.default_lambda.this_lambda_function_qualified_arn
         }
       }
+    }
+
+    next_image = {
+      path_pattern = "${local.base_path}_next/image/*"
+
+      min_ttl     = 0
+      default_ttl = 60
+      max_ttl     = 31536000
+
+      query_string    = false
+      cookies_forward = "none"
+      headers         = concat(var.custom_headers, ["Accept"])
+
+      allowed_methods = [
+        "GET"
+      ]
+
+      lambda_function_association = {
+        origin-request = {
+          lambda_arn = module.image_lambda.this_lambda_function_qualified_arn
+        }
+      }
+
     }
   }
 
