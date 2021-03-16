@@ -287,7 +287,7 @@ module "site" {
       default_ttl = 60
       max_ttl     = 31536000
 
-      query_string    = false
+      query_string    = true
       cookies_forward = "none"
       headers         = concat(var.custom_headers, ["Accept"])
 
