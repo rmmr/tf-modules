@@ -291,9 +291,7 @@ module "site" {
       cookies_forward = "none"
       headers         = concat(var.custom_headers, ["Accept"])
 
-      allowed_methods = [
-        "GET"
-      ]
+      allowed_methods = ["HEAD", "GET"]
 
       lambda_function_association = {
         origin-request = {
