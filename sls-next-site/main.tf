@@ -84,7 +84,7 @@ locals {
     for filename in fileset(local.assets_dir, "public/**") :
     filename => {
       filename      = "${local.assets_dir}/${filename}"
-      cache_control = local.cache_control.default_public_dir_cache_control
+      cache_control = local.cache_control_headers.default_public_dir_cache_control
     }
   }
 
