@@ -33,11 +33,36 @@ resource "aws_s3_bucket" "_" {
   tags = var.tags
 }
 
+resource "aws_cloudfront_origin_access_identity" "_" {
+
+}
+
+data "aws_iam_policy_document" "s3_policy" {
+  statement {
+    actions   = ["s3:GetObject"]
+    resources = ["${aws_s3_bucket._.arn}/*"]
+
+    principals {
+      type        = "AWS"
+      identifiers = [aws_cloudfront_origin_access_identity._.iam_arn]
+    }
+  }
+}
+
+resource "aws_s3_bucket_policy" "_" {
+  bucket = aws_s3_bucket._.id
+  policy = data.aws_iam_policy_document.s3_policy.json
+}
+
 resource "aws_cloudfront_distribution" "_" {
   origin {
     // workaround for https://github.com/terraform-providers/terraform-provider-aws/issues/15102
     domain_name = "${aws_s3_bucket._.bucket}.s3.${data.aws_region.current.name}.amazonaws.com"
     origin_id   = local.s3_origin_id
+
+    s3_origin_config {
+      origin_access_identity = aws_cloudfront_origin_access_identity._.cloudfront_access_identity_path
+    }
   }
 
   enabled     = var.enabled

@@ -281,19 +281,17 @@ module "site" {
     }
 
     next_image = {
-      path_pattern = "${local.base_path}_next/image/*"
+      path_pattern = "${local.base_path}_next/image*"
 
       min_ttl     = 0
       default_ttl = 2678400
       max_ttl     = 31536000
 
-      query_string    = false
+      query_string    = true
       cookies_forward = "none"
       headers         = concat(var.custom_headers, ["Accept"])
 
-      allowed_methods = [
-        "GET"
-      ]
+      allowed_methods = ["HEAD", "GET"]
 
       lambda_function_association = {
         origin-request = {
