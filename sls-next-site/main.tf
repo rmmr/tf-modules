@@ -284,7 +284,7 @@ module "site" {
       path_pattern = "${local.base_path}_next/image*"
 
       min_ttl     = 0
-      default_ttl = 60
+      default_ttl = 2678400
       max_ttl     = 31536000
 
       query_string    = true
