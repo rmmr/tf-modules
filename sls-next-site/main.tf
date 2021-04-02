@@ -43,7 +43,7 @@ locals {
     for pageFile in values(local.pages_manifest) :
     "static-pages/${local.build_id}/${replace(pageFile, "pages/", "")}" => {
       filename      = "${var.next_dir}/serverless/${pageFile}"
-      cache_control = length(regex("\\[.*]", pageFile)) > 0 ? local.cache_control_headers.server_no_cache_control : local.cache_control_headers.server_cache_control
+      cache_control = length(regexall("\\[.*]", pageFile)) > 0 ? local.cache_control_headers.server_no_cache_control : local.cache_control_headers.server_cache_control
     }
     if length(pageFile) > 5 && substr(pageFile, length(pageFile) - 5, 5) == ".html"
   } : null
