@@ -1,4 +1,12 @@
 locals {
+
+  cache_control_headers = {
+    immutable                        = "public, max-age=31536000, immutable"
+    server_cache_control             = "public, max-age=0, s-maxage=2678400, must-revalidate"
+    server_no_cache_control          = "public, max-age=0, s-maxage=0, must-revalidate"
+    default_public_dir_cache_control = "public, max-age=31536000, must-revalidate"
+  }
+
   runtime = "nodejs${var.nodejs_version}"
 
   default_lambda_manifest_file = "${var.serverless_next_dir}/default-lambda/manifest.json"
@@ -25,23 +33,32 @@ locals {
 
   next_static_paths = {
     for filename in fileset(var.next_dir, "static/**") :
-    "_next/${filename}" => "${var.next_dir}/${filename}"
+    "_next/${filename}" => {
+      filename      = "${var.next_dir}/${filename}"
+      cache_control = local.cache_control_headers.immutable
+    }
   }
 
   static_pages_paths = local.pages_manifest != null ? {
     for pageFile in values(local.pages_manifest) :
-    "static-pages/${local.build_id}/${replace(pageFile, "pages/", "")}" => "${var.next_dir}/serverless/${pageFile}"
+    "static-pages/${local.build_id}/${replace(pageFile, "pages/", "")}" => {
+      filename      = "${var.next_dir}/serverless/${pageFile}"
+      cache_control = length(regex("\\[.*]", pageFile)) > 0 ? local.cache_control_headers.server_no_cache_control : local.cache_control_headers.server_cache_control
+    }
     if length(pageFile) > 5 && substr(pageFile, length(pageFile) - 5, 5) == ".html"
   } : null
 
   prerender_pages_json_paths = local.prerender_manifest != null ? {
     for key in keys(local.prerender_manifest.routes) :
     substr(local.prerender_manifest.routes[key].dataRoute, 1, length(local.prerender_manifest.routes[key].dataRoute) - 1)
-    => "${
-      var.next_dir}/serverless/pages/${substr(key, length(key) - 1, 1) == "/"
-      ? "${trimprefix(key, "/")}index.json"
-      : "${trimprefix(key, "/")}.json"
-    }"
+    => {
+      filename = "${
+        var.next_dir}/serverless/pages/${substr(key, length(key) - 1, 1) == "/"
+        ? "${trimprefix(key, "/")}index.json"
+        : "${trimprefix(key, "/")}.json"
+      }"
+      cache_control = local.cache_control_headers.server_cache_control
+    }
   } : null
 
   prerender_pages_html_paths = local.prerender_manifest != null ? {
@@ -51,18 +68,24 @@ locals {
       ? "${trimprefix(key, "/")}index.html"
       : "${trimprefix(key, "/")}.html"
     }"
-    => "${var.next_dir}/serverless/pages/${
-      substr(key, length(key) - 1, 1) == "/"
-      ? "${trimprefix(key, "/")}index.html"
-      : "${trimprefix(key, "/")}.html"
-    }"
+    => {
+      filename = "${var.next_dir}/serverless/pages/${
+        substr(key, length(key) - 1, 1) == "/"
+        ? "${trimprefix(key, "/")}index.html"
+        : "${trimprefix(key, "/")}.html"
+      }"
+      cache_control = local.cache_control_headers.server_cache_control
+    }
   } : null
 
   assets_dir = "${var.serverless_next_dir}/assets"
 
   public_paths = {
     for filename in fileset(local.assets_dir, "public/**") :
-    filename => "${local.assets_dir}/${filename}"
+    filename => {
+      filename      = "${local.assets_dir}/${filename}"
+      cache_control = local.cache_control.default_public_dir_cache_control
+    }
   }
 
   files = merge(
@@ -150,18 +173,19 @@ module "image_lambda" {
 
 module "mime" {
   source = "../mime"
-  files  = toset(values(local.files))
+  files  = toset([for file in values(local.files) : file.filename])
 }
 
 resource "aws_s3_bucket_object" "files" {
   for_each = local.files
 
-  bucket       = module.site.bucket
-  key          = each.key
-  source       = each.value
-  acl          = "public-read"
-  etag         = filemd5(each.value)
-  content_type = module.mime.types[each.value]
+  bucket        = module.site.bucket
+  key           = each.key
+  source        = each.value.filename
+  acl           = "public-read"
+  etag          = filemd5(each.value.filename)
+  content_type  = module.mime.types[each.value.filename]
+  cache_control = each.value.cache_control
 }
 
 module "site" {
@@ -284,7 +308,7 @@ module "site" {
       path_pattern = "${local.base_path}_next/image*"
 
       min_ttl     = 0
-      default_ttl = 2678400
+      default_ttl = 60
       max_ttl     = 31536000
 
       query_string    = true
