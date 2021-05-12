@@ -24,6 +24,7 @@ resource "aws_db_proxy" "_" {
   name                   = "${var.name}-proxy"
   debug_logging          = var.debug
   engine_family          = var.engine_family
+  engine_mode            = var.engine_mode
   require_tls            = var.require_tls
   idle_client_timeout    = var.idle_client_timeout
   role_arn               = aws_iam_role.db_proxy.arn

@@ -22,6 +22,11 @@ variable "engine_family" {
   type = string
 }
 
+variable "engine_mode" {
+  type    = string
+  default = null
+}
+
 variable "availability_zones" {
   type = list(string)
 }
