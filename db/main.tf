@@ -20,38 +20,6 @@ resource "aws_secretsmanager_secret_version" "_" {
   secret_string = jsonencode(local.secret)
 }
 
-resource "aws_db_proxy" "_" {
-  name                   = "${var.name}-proxy"
-  debug_logging          = var.debug
-  engine_family          = var.engine_family
-  require_tls            = var.require_tls
-  idle_client_timeout    = var.idle_client_timeout
-  role_arn               = aws_iam_role.db_proxy.arn
-  vpc_security_group_ids = var.security_group_ids
-  vpc_subnet_ids         = var.subnet_ids
-
-  auth {
-    auth_scheme = "SECRETS"
-    iam_auth    = "DISABLED"
-    secret_arn  = aws_secretsmanager_secret._.arn
-  }
-
-  tags = var.tags
-}
-
-resource "aws_db_proxy_default_target_group" "_" {
-  db_proxy_name = aws_db_proxy._.name
-  connection_pool_config {
-
-  }
-}
-
-resource "aws_db_proxy_target" "_" {
-  db_cluster_identifier = aws_rds_cluster._.cluster_identifier
-  db_proxy_name         = aws_db_proxy._.name
-  target_group_name     = aws_db_proxy_default_target_group._.name
-}
-
 resource "aws_db_subnet_group" "_" {
   name       = "${var.name}-subnet-group"
   subnet_ids = var.subnet_ids
@@ -76,7 +44,7 @@ resource "aws_rds_cluster" "_" {
 }
 
 resource "aws_rds_cluster_instance" "_" {
-  count              = var.instance_count
+  count              = var.engine_mode != "serverless" ? var.instance_count : 0
   identifier         = "${var.name}-instance-${count.index}"
   cluster_identifier = aws_rds_cluster._.id
   instance_class     = var.instance_class
@@ -84,7 +52,44 @@ resource "aws_rds_cluster_instance" "_" {
   engine_version     = aws_rds_cluster._.engine_version
 }
 
+resource "aws_db_proxy" "_" {
+  count                  = var.create_db_proxy ? 1 : 0
+  name                   = "${var.name}-proxy"
+  debug_logging          = var.debug
+  engine_family          = var.engine_family
+  require_tls            = var.require_tls
+  idle_client_timeout    = var.idle_client_timeout
+  role_arn               = aws_iam_role.db_proxy.arn
+  vpc_security_group_ids = var.security_group_ids
+  vpc_subnet_ids         = var.subnet_ids
+
+  auth {
+    auth_scheme = "SECRETS"
+    iam_auth    = "DISABLED"
+    secret_arn  = aws_secretsmanager_secret._.arn
+  }
+
+  tags = var.tags
+}
+
+
+resource "aws_db_proxy_default_target_group" "_" {
+  count         = var.create_db_proxy ? 1 : 0
+  db_proxy_name = aws_db_proxy._.0.name
+  connection_pool_config {
+
+  }
+}
+
+resource "aws_db_proxy_target" "_" {
+  count                 = var.create_db_proxy ? 1 : 0
+  db_cluster_identifier = aws_rds_cluster._.cluster_identifier
+  db_proxy_name         = aws_db_proxy._.0.name
+  target_group_name     = aws_db_proxy_default_target_group._.0.name
+}
+
 resource "aws_iam_policy" "db_proxy" {
+  count  = var.create_db_proxy ? 1 : 0
   name   = "${var.name}-proxy-policy"
   policy = <<EOF
 {
@@ -114,6 +119,7 @@ EOF
 }
 
 resource "aws_iam_role" "db_proxy" {
+  count              = var.create_db_proxy ? 1 : 0
   name               = "${var.name}-proxy-role"
   assume_role_policy = <<EOF
 {
@@ -135,7 +141,8 @@ EOF
 }
 
 resource "aws_iam_role_policy_attachment" "db_proxy" {
-  role       = aws_iam_role.db_proxy.name
-  policy_arn = aws_iam_policy.db_proxy.arn
+  count      = var.create_db_proxy ? 1 : 0
+  role       = aws_iam_role.db_proxy.0.name
+  policy_arn = aws_iam_policy.db_proxy.0.arn
 }
 

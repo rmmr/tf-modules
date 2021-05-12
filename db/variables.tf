@@ -2,6 +2,11 @@ variable "name" {
   type = string
 }
 
+variable "create_db_proxy" {
+  type    = bool
+  default = false
+}
+
 variable "security_group_ids" {
   type = list(string)
 }
