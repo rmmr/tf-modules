@@ -1,5 +1,5 @@
 output "db_proxy_endpoint" {
-  value = aws_db_proxy._.0.endpoint
+  value = var.create_db_proxy ? aws_db_proxy._.0.endpoint : null
 }
 
 output "db_cluster_instance_endpoints" {

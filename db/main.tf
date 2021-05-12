@@ -59,7 +59,7 @@ resource "aws_db_proxy" "_" {
   engine_family          = var.engine_family
   require_tls            = var.require_tls
   idle_client_timeout    = var.idle_client_timeout
-  role_arn               = aws_iam_role.db_proxy.arn
+  role_arn               = aws_iam_role.db_proxy.0.arn
   vpc_security_group_ids = var.security_group_ids
   vpc_subnet_ids         = var.subnet_ids
 
