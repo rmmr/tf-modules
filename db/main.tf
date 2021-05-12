@@ -24,7 +24,6 @@ resource "aws_db_proxy" "_" {
   name                   = "${var.name}-proxy"
   debug_logging          = var.debug
   engine_family          = var.engine_family
-  engine_mode            = var.engine_mode
   require_tls            = var.require_tls
   idle_client_timeout    = var.idle_client_timeout
   role_arn               = aws_iam_role.db_proxy.arn
@@ -66,6 +65,7 @@ resource "aws_rds_cluster" "_" {
   availability_zones      = var.availability_zones
   engine                  = var.engine
   engine_version          = var.engine_version
+  engine_mode             = var.engine_mode
   database_name           = var.database_name
   master_username         = local.secret.username
   master_password         = local.secret.password
