@@ -12,6 +12,16 @@ variable "env" {
   default = {}
 }
 
+variable "pre_cmd" {
+  type    = string
+  default = null
+}
+
+variable "post_cmd" {
+  type    = string
+  default = null
+}
+
 variable "domain_redirects" {
   type    = map(string)
   default = {}
