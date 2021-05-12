@@ -69,7 +69,8 @@ variable "instance_count" {
 }
 
 variable "instance_class" {
-  type = string
+  type    = string
+  default = null
 }
 
 variable "debug" {
