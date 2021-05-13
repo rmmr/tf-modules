@@ -48,7 +48,7 @@ resource "aws_rds_cluster" "_" {
     iterator = sc
 
     content {
-      auto_pause               = lookup(sc.value, "auto_pause", false)
+      auto_pause               = lookup(sc.value, "auto_pause", true)
       min_capacity             = lookup(sc.value, "min_capacity", null)
       max_capacity             = lookup(sc.value, "max_capacity", null)
       seconds_until_auto_pause = lookup(sc.value, "seconds_until_auto_pause", null)
