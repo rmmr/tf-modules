@@ -40,6 +40,7 @@ resource "aws_rds_cluster" "_" {
   backup_retention_period = var.backup_retention_period
   preferred_backup_window = var.preferred_backup_window
   skip_final_snapshot     = var.skip_final_snapshot
+  snapshot_identifier     = var.snapshot_identifier
   tags                    = var.tags
 }
 

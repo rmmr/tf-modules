@@ -93,6 +93,11 @@ variable "publicly_accessible" {
   default = false
 }
 
+variable "snapshot_identifier" {
+  type    = string
+  default = null
+}
+
 variable "tags" {
   type    = map(string)
   default = {}
