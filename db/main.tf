@@ -44,7 +44,7 @@ resource "aws_rds_cluster" "_" {
   tags                    = var.tags
 
   dynamic "scaling_configuration" {
-    for_each = length(keys(var.scaling_configuration)) == 0 ? [] : [var.scaling_configuration]
+    for_each = var.scaling_configuration == null ? [] : [var.scaling_configuration]
     iterator = sc
 
     content {
