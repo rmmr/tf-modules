@@ -42,6 +42,10 @@ resource "aws_rds_cluster" "_" {
   skip_final_snapshot     = var.skip_final_snapshot
   snapshot_identifier     = var.snapshot_identifier
   tags                    = var.tags
+
+  scaling_configuration {
+    min_capacity = var.min_capacity
+  }
 }
 
 resource "aws_rds_cluster_instance" "_" {

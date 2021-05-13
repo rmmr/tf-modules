@@ -98,6 +98,11 @@ variable "snapshot_identifier" {
   default = null
 }
 
+variable "min_capacity" {
+  type    = number
+  default = 2
+}
+
 variable "tags" {
   type    = map(string)
   default = {}
