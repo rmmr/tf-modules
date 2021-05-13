@@ -98,9 +98,9 @@ variable "snapshot_identifier" {
   default = null
 }
 
-variable "min_capacity" {
-  type    = number
-  default = 2
+variable "scaling_configuration" {
+  type    = any
+  default = null
 }
 
 variable "tags" {

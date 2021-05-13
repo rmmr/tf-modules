@@ -43,8 +43,13 @@ resource "aws_rds_cluster" "_" {
   snapshot_identifier     = var.snapshot_identifier
   tags                    = var.tags
 
-  scaling_configuration {
-    min_capacity = var.min_capacity
+  dynamic "scaling_configuration" {
+    for_each = var.scaling_configuration
+    iterator = sc
+
+    content {
+      min_capacity = lookup(sc.value, "min_capacity", 2)
+    }
   }
 }
 
