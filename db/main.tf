@@ -44,11 +44,15 @@ resource "aws_rds_cluster" "_" {
   tags                    = var.tags
 
   dynamic "scaling_configuration" {
-    for_each = var.scaling_configuration
+    for_each = length(keys(var.scaling_configuration)) == 0 ? [] : [var.scaling_configuration]
     iterator = sc
 
     content {
-      min_capacity = lookup(sc.value, "min_capacity", 2)
+      auto_pause               = lookup(sc.value, "auto_pause", null)
+      min_capacity             = lookup(sc.value, "min_capacity", null)
+      max_capacity             = lookup(sc.value, "max_capacity", null)
+      seconds_until_auto_pause = lookup(sc.value, "seconds_until_auto_pause", null)
+      timeout_action           = lookup(sc.value, "timeout_action", null)
     }
   }
 }

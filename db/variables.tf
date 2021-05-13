@@ -99,8 +99,8 @@ variable "snapshot_identifier" {
 }
 
 variable "scaling_configuration" {
-  type    = any
-  default = null
+  type    = map(any)
+  default = {}
 }
 
 variable "tags" {
