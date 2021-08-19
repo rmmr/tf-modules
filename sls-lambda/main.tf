@@ -157,7 +157,7 @@ module "lambda" {
   allowed_triggers = contains([for event in each.value.events : event.type], "http") ? {
     AllowExecutionFromAPIGateway = {
       service    = "apigateway"
-      source_arn = "${module.api_gateway[0].this_apigatewayv2_api_execution_arn}/*"
+      source_arn = "${module.api_gateway[0].apigatewayv2_api_execution_arn}/*"
     }
   } : {}
 
