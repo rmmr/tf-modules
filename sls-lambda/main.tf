@@ -49,8 +49,8 @@ resource "aws_route53_record" "api_gateway" {
   zone_id = var.zone_id
 
   alias {
-    name                   = module.api_gateway[0].this_apigatewayv2_domain_name_configuration[0].target_domain_name
-    zone_id                = module.api_gateway[0].this_apigatewayv2_domain_name_configuration[0].hosted_zone_id
+    name                   = module.api_gateway[0].apigatewayv2_domain_name_configuration[0].target_domain_name
+    zone_id                = module.api_gateway[0].apigatewayv2_domain_name_configuration[0].hosted_zone_id
     evaluate_target_health = false
   }
 }
