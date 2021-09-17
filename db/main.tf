@@ -9,6 +9,7 @@ locals {
     username = var.database_user
     password = var.database_password
   }
+  is_aurora = split("-", var.engine)[0] == "aurora"
 }
 
 resource "aws_secretsmanager_secret" "_" {
@@ -27,6 +28,7 @@ resource "aws_db_subnet_group" "_" {
 }
 
 resource "aws_rds_cluster" "_" {
+  count                   = var.is_aurora ? 1 : 0
   cluster_identifier      = "${var.name}-cluster"
   db_subnet_group_name    = aws_db_subnet_group._.name
   vpc_security_group_ids  = var.security_group_ids
@@ -58,12 +60,27 @@ resource "aws_rds_cluster" "_" {
 }
 
 resource "aws_rds_cluster_instance" "_" {
-  count              = var.engine_mode != "serverless" ? var.instance_count : 0
+  count              = var.is_aurora && var.engine_mode != "serverless" ? var.instance_count : 0
   identifier         = "${var.name}-instance-${count.index}"
-  cluster_identifier = aws_rds_cluster._.id
+  cluster_identifier = aws_rds_cluster._.0.id
   instance_class     = var.instance_class
-  engine             = aws_rds_cluster._.engine
-  engine_version     = aws_rds_cluster._.engine_version
+  engine             = aws_rds_cluster._.0.engine
+  engine_version     = aws_rds_cluster._.0.engine_version
+}
+
+resource "aws_db_instance" "_" {
+  count                  = !var.is_aurora ? var.instance_count : 0
+  identifier             = "${var.name}-instance-${count.index}"
+  db_subnet_group_name   = aws_db_subnet_group._.name
+  vpc_security_group_ids = var.security_group_ids
+  instance_class         = var.instance_class
+  allocated_storage      = var.allocated_storage
+  engine                 = var.engine
+  engine_version         = var.engine_version
+  name                   = var.database_name
+  username               = local.secret.username
+  password               = local.secret.password
+  skip_final_snapshot    = var.skip_final_snapshot
 }
 
 resource "aws_db_proxy" "_" {
@@ -97,7 +114,7 @@ resource "aws_db_proxy_default_target_group" "_" {
 
 resource "aws_db_proxy_target" "_" {
   count                 = var.create_db_proxy ? 1 : 0
-  db_cluster_identifier = aws_rds_cluster._.cluster_identifier
+  db_cluster_identifier = aws_rds_cluster._.0.cluster_identifier
   db_proxy_name         = aws_db_proxy._.0.name
   target_group_name     = aws_db_proxy_default_target_group._.0.name
 }

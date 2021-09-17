@@ -73,6 +73,11 @@ variable "instance_class" {
   default = null
 }
 
+variable "allocated_storage" {
+  type    = number
+  default = null
+}
+
 variable "debug" {
   type    = bool
   default = false
