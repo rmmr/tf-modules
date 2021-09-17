@@ -28,7 +28,7 @@ resource "aws_db_subnet_group" "_" {
 }
 
 resource "aws_rds_cluster" "_" {
-  count                   = var.is_aurora ? 1 : 0
+  count                   = local.is_aurora ? 1 : 0
   cluster_identifier      = "${var.name}-cluster"
   db_subnet_group_name    = aws_db_subnet_group._.name
   vpc_security_group_ids  = var.security_group_ids
@@ -60,7 +60,7 @@ resource "aws_rds_cluster" "_" {
 }
 
 resource "aws_rds_cluster_instance" "_" {
-  count              = var.is_aurora && var.engine_mode != "serverless" ? var.instance_count : 0
+  count              = local.is_aurora && var.engine_mode != "serverless" ? var.instance_count : 0
   identifier         = "${var.name}-instance-${count.index}"
   cluster_identifier = aws_rds_cluster._.0.id
   instance_class     = var.instance_class
@@ -69,7 +69,7 @@ resource "aws_rds_cluster_instance" "_" {
 }
 
 resource "aws_db_instance" "_" {
-  count                  = !var.is_aurora ? var.instance_count : 0
+  count                  = !local.is_aurora ? var.instance_count : 0
   identifier             = "${var.name}-instance-${count.index}"
   db_subnet_group_name   = aws_db_subnet_group._.name
   vpc_security_group_ids = var.security_group_ids
