@@ -7,6 +7,11 @@ variable "availability_zones" {
   default = null
 }
 
+variable "num_availability_zones" {
+  type    = number
+  default = null
+}
+
 variable "security_group_ids" {
   type    = list(string)
   default = null

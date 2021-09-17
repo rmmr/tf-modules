@@ -1,5 +1,6 @@
 locals {
-  availability_zones = var.availability_zones != null ? var.availability_zones : data.aws_availability_zones.available.names
+  all_availability_zones = var.availability_zones != null ? var.availability_zones : data.aws_availability_zones.available.names
+  availability_zones     = var.num_availability_zones != null ? slice(local.all_availability_zones, 0, var.num_availability_zones) : local.all_availability_zones
 }
 
 data "aws_availability_zones" "available" {
