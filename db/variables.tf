@@ -24,7 +24,8 @@ variable "engine_version" {
 }
 
 variable "engine_family" {
-  type = string
+  type    = string
+  default = null
 }
 
 variable "engine_mode" {
