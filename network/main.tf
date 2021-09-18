@@ -51,6 +51,18 @@ resource "aws_route_table_association" "private" {
   subnet_id      = aws_subnet.private[count.index].id
 }
 
+resource "aws_route_table" "public" {
+  vpc_id = aws_vpc._.id
+  tags   = var.tags
+}
+
+resource "aws_route_table_association" "public" {
+  count          = length(aws_subnet.public)
+  route_table_id = aws_route_table.public.id
+  subnet_id      = aws_subnet.public[count.index].id
+  gateway_id     = var.enable_internet_gateway ? aws_internet_gateway._.0.id : null
+}
+
 resource "aws_vpc_endpoint" "s3" {
   count        = var.enable_s3_endpoint ? 1 : 0
   vpc_id       = aws_vpc._.id
