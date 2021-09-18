@@ -52,16 +52,15 @@ resource "aws_route_table_association" "private" {
 }
 
 resource "aws_route_table" "public" {
-  count  = var.create_public_subnet && var.enable_internet_gateway ? 1 : 0
+  count  = var.create_public_subnet ? 1 : 0
   vpc_id = aws_vpc._.id
   tags   = var.tags
+}
 
-  route = [
-    {
-      cidr_block = "0.0.0.0/0"
-      gateway_id = aws_internet_gateway._.0.id
-    }
-  ]
+resource "aws_route" "publig_igw" {
+  count      = var.create_public_subnet && var.enable_internet_gateway ? 1 : 0
+  cidr_block = "0.0.0.0/0"
+  gateway_id = aws_internet_gateway._.0.id
 }
 
 resource "aws_route_table_association" "public" {
