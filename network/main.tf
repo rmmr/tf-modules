@@ -58,9 +58,10 @@ resource "aws_route_table" "public" {
 }
 
 resource "aws_route" "publig_igw" {
-  count      = var.create_public_subnet && var.enable_internet_gateway ? 1 : 0
-  cidr_block = "0.0.0.0/0"
-  gateway_id = aws_internet_gateway._.0.id
+  count                  = var.create_public_subnet && var.enable_internet_gateway ? 1 : 0
+  destination_cidr_block = "0.0.0.0/0"
+  route_table_id         = aws_route_table.public.0.id
+  gateway_id             = aws_internet_gateway._.0.id
 }
 
 resource "aws_route_table_association" "public" {
