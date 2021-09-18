@@ -15,7 +15,7 @@ resource "aws_vpc" "_" {
 }
 
 resource "aws_internet_gateway" "_" {
-  count  = var.enable_internet_gateway && var.create_public_subnet ? length(aws_subnet.public) : 0
+  count  = var.enable_internet_gateway ? 1 : 0
   vpc_id = aws_vpc._.id
   tags   = var.tags
 }
@@ -52,15 +52,21 @@ resource "aws_route_table_association" "private" {
 }
 
 resource "aws_route_table" "public" {
+  count  = var.create_public_subnet ? 1 : 0
   vpc_id = aws_vpc._.id
   tags   = var.tags
 }
 
 resource "aws_route_table_association" "public" {
   count          = length(aws_subnet.public)
-  route_table_id = aws_route_table.public.id
+  route_table_id = aws_route_table.public.0.id
   subnet_id      = aws_subnet.public[count.index].id
-  gateway_id     = var.enable_internet_gateway ? aws_internet_gateway._[count.index].id : null
+}
+
+resource "aws_route_table_association" "igw" {
+  count          = var.enable_internet_gateway && var.create_public_subnet ? 1 : 0
+  route_table_id = aws_route_table.public.0.id
+  gateway_id     = aws_internet_gateway._.0.id
 }
 
 resource "aws_vpc_endpoint" "s3" {
