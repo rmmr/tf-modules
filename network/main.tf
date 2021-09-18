@@ -55,18 +55,19 @@ resource "aws_route_table" "public" {
   count  = var.create_public_subnet ? 1 : 0
   vpc_id = aws_vpc._.id
   tags   = var.tags
+
+  route = var.enable_internet_gateway ? [
+    {
+      cidr_block = "0.0.0.0/0"
+      gateway_id = aws_internet_gateway._.0.id
+    }
+  ] : []
 }
 
 resource "aws_route_table_association" "public" {
   count          = length(aws_subnet.public)
   route_table_id = aws_route_table.public.0.id
   subnet_id      = aws_subnet.public[count.index].id
-}
-
-resource "aws_route_table_association" "igw" {
-  count          = var.enable_internet_gateway && var.create_public_subnet ? 1 : 0
-  route_table_id = aws_route_table.public.0.id
-  gateway_id     = aws_internet_gateway._.0.id
 }
 
 resource "aws_vpc_endpoint" "s3" {
