@@ -64,9 +64,10 @@ resource "aws_route_table_association" "public" {
 }
 
 resource "aws_route_table_association" "igw" {
-  count          = var.enable_internet_gateway && var.create_public_subnet ? 1 : 0
-  route_table_id = aws_route_table.public.0.id
-  gateway_id     = aws_internet_gateway._.0.id
+  count                  = var.enable_internet_gateway && var.create_public_subnet ? 1 : 0
+  route_table_id         = aws_route_table.public.0.id
+  destination_cidr_block = "0.0.0.0/0"
+  gateway_id             = aws_internet_gateway._.0.id
 }
 
 resource "aws_vpc_endpoint" "s3" {
