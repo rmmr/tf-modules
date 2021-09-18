@@ -80,6 +80,7 @@ resource "aws_db_instance" "_" {
   name                   = var.database_name
   username               = local.secret.username
   password               = local.secret.password
+  publicly_accessible    = var.publicly_accessible
   skip_final_snapshot    = var.skip_final_snapshot
 }
 

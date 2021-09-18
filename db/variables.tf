@@ -37,6 +37,11 @@ variable "availability_zones" {
   type = list(string)
 }
 
+variable "publicly_accessible" {
+  type    = bool
+  default = false
+}
+
 variable "database_name" {
   type = string
 }
