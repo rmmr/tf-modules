@@ -84,6 +84,14 @@ resource "aws_vpc_endpoint" "dynamodb" {
   tags         = var.tags
 }
 
+resource "aws_vpc_endpoint" "textract" {
+  count        = var.enable_textract_endpoint ? 1 : 0
+  vpc_id       = aws_vpc._.id
+  service_name = "com.amazonaws.${var.aws_region}.textract"
+  tags         = var.tags
+}
+
+
 resource "aws_vpc_endpoint" "sqs" {
   count               = var.enable_sqs_endpoint ? 1 : 0
   vpc_id              = aws_vpc._.id

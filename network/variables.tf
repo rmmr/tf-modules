@@ -37,6 +37,11 @@ variable "enable_sqs_endpoint" {
   default = false
 }
 
+variable "enable_textract_endpoint" {
+  type    = bool
+  default = false
+}
+
 variable "enable_internet_gateway" {
   type    = bool
   default = false
