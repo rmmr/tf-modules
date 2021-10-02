@@ -124,7 +124,7 @@ resource "aws_s3_bucket_notification" "notification" {
 
   lambda_function {
     lambda_function_arn = module.lambda[each.value.function].this_lambda_function_arn
-    events              = [each.value.event]
+    events              = [each.value.type]
   }
 }
 
