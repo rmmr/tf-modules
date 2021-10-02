@@ -16,6 +16,21 @@ locals {
     ]...)
   ]...)
 
+  s3_events = merge({}, [
+    for key, function in var.functions :
+    merge([
+      for event in function.events :
+      {
+        ("${key}-${event.type}") = {
+          function = key
+          type     = event.type
+          bucket   = event.bucket
+        }
+      }
+      if split(":", event.type)[0] == "s3"
+    ]...)
+  ]...)
+
   schedule_events = merge({}, [
     for key, function in var.functions :
     merge([
@@ -96,11 +111,18 @@ module "api_gateway" {
 }
 
 resource "aws_lambda_event_source_mapping" "sqs" {
-
   for_each = local.sqs_events
 
   event_source_arn = each.key
   function_name    = module.lambda[each.value].this_lambda_function_arn
+}
+
+resource "aws_s3_bucket_notification" "notification" {
+  for_each = local.s3_events
+
+  bucket              = each.value.bucket
+  lambda_function_arn = module.lambda[each.value.function].this_lambda_function_arn
+  events              = [each.value.event]
 }
 
 resource "aws_cloudwatch_event_rule" "rule" {
