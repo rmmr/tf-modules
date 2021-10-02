@@ -120,9 +120,12 @@ resource "aws_lambda_event_source_mapping" "sqs" {
 resource "aws_s3_bucket_notification" "notification" {
   for_each = local.s3_events
 
-  bucket              = each.value.bucket
-  lambda_function_arn = module.lambda[each.value.function].this_lambda_function_arn
-  events              = [each.value.event]
+  bucket = each.value.bucket
+
+  lambda_function {
+    lambda_function_arn = module.lambda[each.value.function].this_lambda_function_arn
+    events              = [each.value.event]
+  }
 }
 
 resource "aws_cloudwatch_event_rule" "rule" {
