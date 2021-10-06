@@ -179,6 +179,8 @@ module "lambda" {
   s3_object_version = try(each.value.s3_object_version, null)
   source_code_hash  = try(each.value.source_code_hash, null)
 
+  layers = try(each.value.layers, null)
+
   allowed_triggers = contains([for event in each.value.events : event.type], "http") ? {
     AllowExecutionFromAPIGateway = {
       service    = "apigateway"

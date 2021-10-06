@@ -55,6 +55,11 @@ variable "source_code_hash" {
   default = null
 }
 
+variable "layers" {
+  type    = list(string)
+  default = null
+}
+
 variable "reserved_concurrent_executions" {
   type    = number
   default = null

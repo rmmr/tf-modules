@@ -100,6 +100,8 @@ resource "aws_lambda_function" "this" {
   s3_key            = var.s3_key
   s3_object_version = var.s3_object_version
 
+  layers = var.layers
+
   dynamic "environment" {
     for_each = var.env != null ? [true] : []
     content {
