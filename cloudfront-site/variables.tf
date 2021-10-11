@@ -16,6 +16,11 @@ variable "bucket_name" {
   default = null
 }
 
+variable "bucket_path" {
+  type    = string
+  default = null
+}
+
 variable "price_class" {
   type    = string
   default = "PriceClass_100"
