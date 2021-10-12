@@ -19,7 +19,7 @@ module "acm" {
 }
 
 resource "aws_s3_bucket" "_" {
-  bucket = var.bucket_name != null ? var.bucket_name : replace(var.domain_name, ".", "-")
+  bucket = var.bucket_name != null ? var.bucket_name : var.domain_name
   acl    = "public-read"
 
   dynamic "website" {
