@@ -32,6 +32,16 @@ variable "enable_dynamodb_endpoint" {
   default = false
 }
 
+variable "enable_kms_endpoint" {
+  type    = bool
+  default = false
+}
+
+variable "enable_secretsmanager_endpoint" {
+  type    = bool
+  default = false
+}
+
 variable "enable_sqs_endpoint" {
   type    = bool
   default = false
