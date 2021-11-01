@@ -149,6 +149,28 @@ resource "aws_vpc_endpoint" "textract" {
   tags                = var.tags
 }
 
+resource "aws_vpc_endpoint" "ecr_dkr" {
+  count               = var.enable_ecr_dkr_endpoint ? 1 : 0
+  vpc_id              = aws_vpc._.id
+  vpc_endpoint_type   = "Interface"
+  service_name        = "com.amazonaws.${var.aws_region}.ecr.dkr"
+  security_group_ids  = var.security_group_ids
+  subnet_ids          = aws_subnet.private.*.id
+  private_dns_enabled = var.enable_dns_hostnames
+  tags                = var.tags
+}
+
+resource "aws_vpc_endpoint" "ecr_api" {
+  count               = var.enable_ecr_api_endpoint ? 1 : 0
+  vpc_id              = aws_vpc._.id
+  vpc_endpoint_type   = "Interface"
+  service_name        = "com.amazonaws.${var.aws_region}.ecr.api"
+  security_group_ids  = var.security_group_ids
+  subnet_ids          = aws_subnet.private.*.id
+  private_dns_enabled = var.enable_dns_hostnames
+  tags                = var.tags
+}
+
 resource "aws_vpc_endpoint" "sqs" {
   count               = var.enable_sqs_endpoint ? 1 : 0
   vpc_id              = aws_vpc._.id

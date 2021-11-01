@@ -27,6 +27,16 @@ variable "enable_s3_endpoint" {
   default = false
 }
 
+variable "enable_ecr_api_endpoint" {
+  type    = bool
+  default = false
+}
+
+variable "enable_ecr_dkr_endpoint" {
+  type    = bool
+  default = false
+}
+
 variable "enable_dynamodb_endpoint" {
   type    = bool
   default = false
