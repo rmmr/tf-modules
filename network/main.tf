@@ -41,7 +41,7 @@ resource "aws_route_table" "private" {
 resource "aws_route_table_association" "private" {
   count = length(aws_subnet.private)
 
-  route_table_id = aws_route_table[count.index].id
+  route_table_id = aws_route_table.private[count.index].id
   subnet_id      = aws_subnet.private[count.index].id
 
   tags = var.tags
@@ -82,7 +82,7 @@ resource "aws_internet_gateway" "_" {
 resource "aws_route" "publig_igw" {
   count                  = var.create_public_subnet && var.enable_internet_gateway ? length(aws_subnet.public) : 0
   destination_cidr_block = "0.0.0.0/0"
-  route_table_id         = aws_route_table.public[index.count].id
+  route_table_id         = aws_route_table.public[count.index].id
   gateway_id             = aws_internet_gateway._.0.id
 }
 
@@ -108,8 +108,8 @@ resource "aws_nat_gateway" "_" {
 resource "aws_route" "private_ngw" {
   count                  = var.enable_nat_gateway ? length(aws_subnet.private) : 0
   destination_cidr_block = "0.0.0.0/0"
-  route_table_id         = aws_route_table.private[index.count].id
-  gateway_id             = aws_nat_gateway._[index.count].id
+  route_table_id         = aws_route_table.private[count.index].id
+  gateway_id             = aws_nat_gateway._[count.index].id
 }
 
 
