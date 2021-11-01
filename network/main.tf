@@ -7,28 +7,18 @@ data "aws_availability_zones" "available" {
   state = "available"
 }
 
+// VPC
+
 resource "aws_vpc" "_" {
   cidr_block           = var.cidr_block
   enable_dns_hostnames = var.enable_dns_hostnames
   enable_dns_support   = var.enable_dns_support
-  tags                 = var.tags
-}
-
-resource "aws_internet_gateway" "_" {
-  count  = var.enable_internet_gateway ? 1 : 0
-  vpc_id = aws_vpc._.id
-  tags   = var.tags
-}
-
-resource "aws_subnet" "public" {
-  count = var.create_public_subnet ? length(local.availability_zones) : 0
-
-  vpc_id            = aws_vpc._.id
-  cidr_block        = cidrsubnet(var.cidr_block, 8, count.index)
-  availability_zone = local.availability_zones[count.index]
 
   tags = var.tags
 }
+
+
+// Private subnets
 
 resource "aws_subnet" "private" {
   count = length(local.availability_zones)
@@ -41,34 +31,89 @@ resource "aws_subnet" "private" {
 }
 
 resource "aws_route_table" "private" {
+  count = length(aws_subnet.private)
+
+  vpc_id = aws_vpc._.id
+
+  tags = var.tags
+}
+
+resource "aws_route_table_association" "private" {
+  count = length(aws_subnet.private)
+
+  route_table_id = aws_route_table[count.index].id
+  subnet_id      = aws_subnet.private[count.index].id
+
+  tags = var.tags
+}
+
+// Public subnets
+
+resource "aws_subnet" "public" {
+  count = var.create_public_subnet ? length(local.availability_zones) : 0
+
+  vpc_id            = aws_vpc._.id
+  cidr_block        = cidrsubnet(var.cidr_block, 8, count.index)
+  availability_zone = local.availability_zones[count.index]
+
+  tags = var.tags
+}
+
+resource "aws_route_table" "public" {
+  count  = var.create_public_subnet ? length(aws_subnet.public) : 0
   vpc_id = aws_vpc._.id
   tags   = var.tags
 }
 
-resource "aws_route_table_association" "private" {
-  count          = length(aws_subnet.private)
-  route_table_id = aws_route_table.private.id
-  subnet_id      = aws_subnet.private[count.index].id
+resource "aws_route_table_association" "public" {
+  count          = length(aws_subnet.public)
+  route_table_id = aws_route_table.public[count.index].id
+  subnet_id      = aws_subnet.public[count.index].id
 }
 
-resource "aws_route_table" "public" {
-  count  = var.create_public_subnet ? 1 : 0
+// Internet gateway
+
+resource "aws_internet_gateway" "_" {
+  count  = var.enable_internet_gateway ? 1 : 0
   vpc_id = aws_vpc._.id
   tags   = var.tags
 }
 
 resource "aws_route" "publig_igw" {
-  count                  = var.create_public_subnet && var.enable_internet_gateway ? 1 : 0
+  count                  = var.create_public_subnet && var.enable_internet_gateway ? length(aws_subnet.public) : 0
   destination_cidr_block = "0.0.0.0/0"
-  route_table_id         = aws_route_table.public.0.id
+  route_table_id         = aws_route_table.public[index.count].id
   gateway_id             = aws_internet_gateway._.0.id
 }
 
-resource "aws_route_table_association" "public" {
-  count          = length(aws_subnet.public)
-  route_table_id = aws_route_table.public.0.id
-  subnet_id      = aws_subnet.public[count.index].id
+// NAT gateway
+
+resource "aws_eip" "nat_gateway" {
+  count = var.enable_nat_gateway ? length(aws_subnet.public) : 0
+  vpc   = true
+
+  tags = var.tags
 }
+
+resource "aws_nat_gateway" "_" {
+  count = var.enable_nat_gateway ? length(aws_subnet.public) : 0
+
+  allocation_id = aws_eip.nat_gateway[count.index].id
+  subnet_id     = aws_subnet.public[count.index].id
+  depends_on    = [aws_internet_gateway._]
+
+  tags = var.tags
+}
+
+resource "aws_route" "private_ngw" {
+  count                  = var.enable_nat_gateway ? length(aws_subnet.private) : 0
+  destination_cidr_block = "0.0.0.0/0"
+  route_table_id         = aws_route_table.private[index.count].id
+  gateway_id             = aws_nat_gateway._[index.count].id
+}
+
+
+// Endpoints
 
 resource "aws_vpc_endpoint" "s3" {
   count        = var.enable_s3_endpoint ? 1 : 0
@@ -130,12 +175,12 @@ resource "aws_vpc_endpoint" "sqs" {
 
 resource "aws_vpc_endpoint_route_table_association" "s3" {
   count           = var.enable_s3_endpoint ? 1 : 0
-  route_table_id  = aws_route_table.private.id
+  route_table_id  = aws_vpc._.default_route_table_id
   vpc_endpoint_id = aws_vpc_endpoint.s3[count.index].id
 }
 
 resource "aws_vpc_endpoint_route_table_association" "dynamodb" {
   count           = var.enable_dynamodb_endpoint ? 1 : 0
-  route_table_id  = aws_route_table.private.id
+  route_table_id  = aws_vpc._.default_route_table_id
   vpc_endpoint_id = aws_vpc_endpoint.dynamodb[count.index].id
 }

@@ -57,6 +57,11 @@ variable "enable_internet_gateway" {
   default = false
 }
 
+variable "enable_nat_gateway" {
+  type    = bool
+  default = false
+}
+
 variable "enable_dns_support" {
   type    = bool
   default = true
