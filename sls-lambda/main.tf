@@ -10,7 +10,10 @@ locals {
     merge([
       for event in function.events :
       {
-        (event.queue_arn) = key
+        (key) = {
+          function  = key
+          queue_arn = event.queue_arn
+        }
       }
       if event.type == "sqs"
     ]...)
@@ -113,8 +116,8 @@ module "api_gateway" {
 resource "aws_lambda_event_source_mapping" "sqs" {
   for_each = local.sqs_events
 
-  event_source_arn = each.key
-  function_name    = module.lambda[each.value].this_lambda_function_arn
+  event_source_arn = each.value.queue_arn
+  function_name    = module.lambda[each.value.function].this_lambda_function_arn
 }
 
 resource "aws_s3_bucket_notification" "notification" {
