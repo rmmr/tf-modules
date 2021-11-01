@@ -103,17 +103,19 @@ resource "aws_route" "private_ngw" {
 // Endpoints
 
 resource "aws_vpc_endpoint" "s3" {
-  count        = var.enable_s3_endpoint ? 1 : 0
-  vpc_id       = aws_vpc._.id
-  service_name = "com.amazonaws.${var.aws_region}.s3"
-  tags         = var.tags
+  count           = var.enable_s3_endpoint ? 1 : 0
+  vpc_id          = aws_vpc._.id
+  service_name    = "com.amazonaws.${var.aws_region}.s3"
+  route_table_ids = aws_route_table.private.*.id
+  tags            = var.tags
 }
 
 resource "aws_vpc_endpoint" "dynamodb" {
-  count        = var.enable_dynamodb_endpoint ? 1 : 0
-  vpc_id       = aws_vpc._.id
-  service_name = "com.amazonaws.${var.aws_region}.dynamodb"
-  tags         = var.tags
+  count           = var.enable_dynamodb_endpoint ? 1 : 0
+  vpc_id          = aws_vpc._.id
+  service_name    = "com.amazonaws.${var.aws_region}.dynamodb"
+  route_table_ids = aws_route_table.private.*.id
+  tags            = var.tags
 }
 
 resource "aws_vpc_endpoint" "kms" {
@@ -180,16 +182,4 @@ resource "aws_vpc_endpoint" "sqs" {
   subnet_ids          = aws_subnet.private.*.id
   private_dns_enabled = var.enable_dns_hostnames
   tags                = var.tags
-}
-
-resource "aws_vpc_endpoint_route_table_association" "s3" {
-  count           = var.enable_s3_endpoint ? 1 : 0
-  route_table_id  = aws_vpc._.default_route_table_id
-  vpc_endpoint_id = aws_vpc_endpoint.s3[count.index].id
-}
-
-resource "aws_vpc_endpoint_route_table_association" "dynamodb" {
-  count           = var.enable_dynamodb_endpoint ? 1 : 0
-  route_table_id  = aws_vpc._.default_route_table_id
-  vpc_endpoint_id = aws_vpc_endpoint.dynamodb[count.index].id
 }
