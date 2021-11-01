@@ -52,6 +52,11 @@ variable "enable_secretsmanager_endpoint" {
   default = false
 }
 
+variable "enable_logs_endpoint" {
+  type    = bool
+  default = false
+}
+
 variable "enable_sqs_endpoint" {
   type    = bool
   default = false

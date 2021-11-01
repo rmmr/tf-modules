@@ -118,6 +118,17 @@ resource "aws_vpc_endpoint" "dynamodb" {
   tags            = var.tags
 }
 
+resource "aws_vpc_endpoint" "logs" {
+  count               = var.enable_logs_endpoint ? 1 : 0
+  vpc_id              = aws_vpc._.id
+  vpc_endpoint_type   = "Interface"
+  service_name        = "com.amazonaws.${var.aws_region}.logs"
+  security_group_ids  = var.security_group_ids
+  subnet_ids          = aws_subnet.private.*.id
+  private_dns_enabled = var.enable_dns_hostnames
+  tags                = var.tags
+}
+
 resource "aws_vpc_endpoint" "kms" {
   count               = var.enable_kms_endpoint ? 1 : 0
   vpc_id              = aws_vpc._.id
