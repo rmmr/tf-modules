@@ -205,3 +205,15 @@ resource "aws_vpc_endpoint" "sns" {
   private_dns_enabled = var.enable_dns_hostnames
   tags                = var.tags
 }
+
+resource "aws_vpc_endpoint" "elasticfilesystem" {
+  count               = var.enable_elasticfilesystem_endpoint ? 1 : 0
+  vpc_id              = aws_vpc._.id
+  vpc_endpoint_type   = "Interface"
+  service_name        = "com.amazonaws.${var.aws_region}.elasticfilesystem"
+  security_group_ids  = var.security_group_ids
+  subnet_ids          = aws_subnet.private.*.id
+  private_dns_enabled = var.enable_dns_hostnames
+  tags                = var.tags
+}
+

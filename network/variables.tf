@@ -57,6 +57,11 @@ variable "enable_logs_endpoint" {
   default = false
 }
 
+variable "enable_elasticfilesystem_endpoint" {
+  type    = bool
+  default = false
+}
+
 variable "enable_sqs_endpoint" {
   type    = bool
   default = false
