@@ -21,42 +21,33 @@ resource "aws_vpc" "_" {
 // Private subnets
 
 resource "aws_subnet" "private" {
-  count = length(local.availability_zones)
-
+  count             = length(local.availability_zones)
   vpc_id            = aws_vpc._.id
   cidr_block        = cidrsubnet(var.cidr_block, 8, 100 + count.index)
   availability_zone = local.availability_zones[count.index]
-
-  tags = var.tags
+  tags              = var.tags
 }
 
 resource "aws_route_table" "private" {
-  count = length(aws_subnet.private)
-
+  count  = length(aws_subnet.private)
   vpc_id = aws_vpc._.id
-
-  tags = var.tags
+  tags   = var.tags
 }
 
 resource "aws_route_table_association" "private" {
-  count = length(aws_subnet.private)
-
+  count          = length(aws_subnet.private)
   route_table_id = aws_route_table.private[count.index].id
   subnet_id      = aws_subnet.private[count.index].id
-
-  tags = var.tags
 }
 
 // Public subnets
 
 resource "aws_subnet" "public" {
-  count = var.create_public_subnet ? length(local.availability_zones) : 0
-
+  count             = var.create_public_subnet ? length(local.availability_zones) : 0
   vpc_id            = aws_vpc._.id
   cidr_block        = cidrsubnet(var.cidr_block, 8, count.index)
   availability_zone = local.availability_zones[count.index]
-
-  tags = var.tags
+  tags              = var.tags
 }
 
 resource "aws_route_table" "public" {
@@ -91,18 +82,15 @@ resource "aws_route" "publig_igw" {
 resource "aws_eip" "nat_gateway" {
   count = var.enable_nat_gateway ? length(aws_subnet.public) : 0
   vpc   = true
-
-  tags = var.tags
+  tags  = var.tags
 }
 
 resource "aws_nat_gateway" "_" {
-  count = var.enable_nat_gateway ? length(aws_subnet.public) : 0
-
+  count         = var.enable_nat_gateway ? length(aws_subnet.public) : 0
   allocation_id = aws_eip.nat_gateway[count.index].id
   subnet_id     = aws_subnet.public[count.index].id
   depends_on    = [aws_internet_gateway._]
-
-  tags = var.tags
+  tags          = var.tags
 }
 
 resource "aws_route" "private_ngw" {
