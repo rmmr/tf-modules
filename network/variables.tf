@@ -62,6 +62,11 @@ variable "enable_sqs_endpoint" {
   default = false
 }
 
+variable "enable_sns_endpoint" {
+  type    = bool
+  default = false
+}
+
 variable "enable_textract_endpoint" {
   type    = bool
   default = false
