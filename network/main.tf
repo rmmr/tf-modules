@@ -13,8 +13,7 @@ resource "aws_vpc" "_" {
   cidr_block           = var.cidr_block
   enable_dns_hostnames = var.enable_dns_hostnames
   enable_dns_support   = var.enable_dns_support
-
-  tags = var.tags
+  tags                 = var.tags
 }
 
 
@@ -97,7 +96,7 @@ resource "aws_route" "private_ngw" {
   count                  = var.enable_nat_gateway ? length(aws_subnet.private) : 0
   destination_cidr_block = "0.0.0.0/0"
   route_table_id         = aws_route_table.private[count.index].id
-  gateway_id             = aws_nat_gateway._[count.index].id
+  nat_gateway_id         = aws_nat_gateway._[count.index].id
 }
 
 
