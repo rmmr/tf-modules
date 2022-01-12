@@ -25,7 +25,7 @@ resource "null_resource" "_" {
         --rm \
         ${join(" ", [for k, v in var.env : "-e ${k}=${v}"])}\
         -v ${local.abs_source_dir}:/var/task \
-        "lambci/lambda:build-python3.7" \
+        "lambci/lambda:build-python3.9" \
         /bin/sh -c "
             mkdir -p /tmp/build; \
             ${fileexists("${local.abs_source_dir}/setup.py") ? "pip install . -t /tmp/build > /dev/null 2>&1;" : ""}\
