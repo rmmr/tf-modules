@@ -120,6 +120,15 @@ resource "aws_lambda_function" "this" {
     }
   }
 
+  dynamic "image_config" {
+    for_each = var.image_config != null ? [true] : []
+    content {
+      command           = try(var.image_config.command, null)
+      entry_point       = try(var.image_config.entry_point, null)
+      working_directory = try(var.image_config.working_directory, null)
+    }
+  }
+
   tags = var.tags
 }
 

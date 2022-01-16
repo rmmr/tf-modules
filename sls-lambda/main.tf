@@ -186,6 +186,8 @@ module "lambda" {
 
   layers = try(each.value.layers, null)
 
+  image_config = try(each.value.image_config, null)
+
   allowed_triggers = contains([for event in each.value.events : event.type], "http") ? {
     AllowExecutionFromAPIGateway = {
       service    = "apigateway"
