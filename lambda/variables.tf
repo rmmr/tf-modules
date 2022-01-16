@@ -71,7 +71,7 @@ variable "layers" {
 }
 
 variable "image_config" {
-  type    = map(string)
+  type    = map(any)
   default = null
 }
 
