@@ -30,7 +30,7 @@ resource "null_resource" "_" {
             mkdir -p /tmp/build; \
             ${fileexists("${local.abs_source_dir}/setup.py") ? "pip install . -t /tmp/build > /dev/null 2>&1;" : ""}\
             ${fileexists("${local.abs_source_dir}/requirements.txt") ? "pip install -r requirements.txt -t /tmp/build > /dev/null 2>&1;" : ""}\
-            ${length(var.exclude_packages) > 0 ? "rm -rf ${join(" ", [for package in var.exclude_packages : "/tmp/build/${package}"])}" : ""} \
+            ${length(var.exclude_packages) > 0 ? "rm -rf ${join(" ", [for package in var.exclude_packages : "/tmp/build/${package}"])};" : ""} \
             cd /tmp/build && zip -r9  - .; \
             exit;" > ${local.abs_output_file}
     EOF
