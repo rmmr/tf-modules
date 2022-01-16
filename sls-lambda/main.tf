@@ -161,8 +161,8 @@ module "lambda" {
   for_each = var.functions
 
   function_name = "${var.name}-${each.key}"
-  handler       = each.value.handler
-  runtime       = each.value.runtime
+  handler       = try(each.value.handler, null)
+  runtime       = try(each.value.runtime, null)
   memory_size   = try(each.value.memory_size, null)
   timeout       = try(each.value.timeout, null)
   env           = try(each.value.env, null)
