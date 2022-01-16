@@ -176,6 +176,8 @@ module "lambda" {
   security_group_ids    = try(each.value.security_group_ids, null)
   attach_network_policy = try(each.value.attach_network_policy, false)
 
+  package_type      = try(each.value.package_type, null)
+  image_uri         = try(each.value.image_uri, null)
   filename          = try(each.value.filename, null)
   s3_bucket         = try(each.value.s3_bucket, null)
   s3_key            = try(each.value.s3_key, null)

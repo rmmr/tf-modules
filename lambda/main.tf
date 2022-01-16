@@ -102,6 +102,9 @@ resource "aws_lambda_function" "this" {
 
   layers = var.layers
 
+  image_uri    = var.image_uri
+  package_type = var.package_type
+
   dynamic "environment" {
     for_each = var.env != null ? [true] : []
     content {

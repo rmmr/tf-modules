@@ -30,6 +30,16 @@ variable "timeout" {
   default = null
 }
 
+variable "package_type" {
+  type    = string
+  default = null
+}
+
+variable "image_uri" {
+  type    = string
+  default = null
+}
+
 variable "s3_bucket" {
   type    = string
   default = null
