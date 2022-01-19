@@ -64,6 +64,11 @@ variable "skip_final_snapshot" {
   default = null
 }
 
+variable "allow_major_version_upgrade" {
+  type    = bool
+  default = null
+}
+
 variable "instance_count" {
   type    = number
   default = 2
