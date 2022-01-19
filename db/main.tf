@@ -45,6 +45,8 @@ resource "aws_rds_cluster" "_" {
   snapshot_identifier     = var.snapshot_identifier
   tags                    = var.tags
 
+  allow_major_version_upgrade = var.allow_major_version_upgrade
+
   dynamic "scaling_configuration" {
     for_each = var.scaling_configuration == null ? [] : [var.scaling_configuration]
     iterator = sc
