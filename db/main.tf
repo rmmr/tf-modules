@@ -62,12 +62,13 @@ resource "aws_rds_cluster" "_" {
 }
 
 resource "aws_rds_cluster_instance" "_" {
-  count              = local.is_aurora && var.engine_mode != "serverless" ? var.instance_count : 0
-  identifier         = "${var.name}-instance-${count.index}"
-  cluster_identifier = aws_rds_cluster._.0.id
-  instance_class     = var.instance_class
-  engine             = aws_rds_cluster._.0.engine
-  engine_version     = aws_rds_cluster._.0.engine_version
+  count               = local.is_aurora && var.engine_mode != "serverless" ? var.instance_count : 0
+  identifier          = "${var.name}-instance-${count.index}"
+  cluster_identifier  = aws_rds_cluster._.0.id
+  instance_class      = var.instance_class
+  engine              = aws_rds_cluster._.0.engine
+  engine_version      = aws_rds_cluster._.0.engine_version
+  publicly_accessible = var.publicly_accessible
 }
 
 resource "aws_db_instance" "_" {
