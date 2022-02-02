@@ -69,10 +69,10 @@ resource "aws_internet_gateway" "_" {
   tags   = var.tags
 }
 
-resource "aws_route" "publig_igw" {
-  count                  = var.create_public_subnet && var.enable_internet_gateway ? length(aws_subnet.public) : 0
+resource "aws_route" "igw" {
+  count                  = var.enable_internet_gateway ? (var.create_public_subnet ? length(aws_subnet.public) : length(aws_subnet.private)) : 0
   destination_cidr_block = "0.0.0.0/0"
-  route_table_id         = aws_route_table.public[count.index].id
+  route_table_id         = var.create_public_subnet ? aws_route_table.public[count.index].id : aws_route_table.private[count.index].id
   gateway_id             = aws_internet_gateway._.0.id
 }
 
