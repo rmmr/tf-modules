@@ -52,7 +52,7 @@ variable "enabled" {
 
 variable "nodejs_version" {
   type    = string
-  default = "16.x"
+  default = "18.x"
 }
 variable "timeout" {
   type    = number
